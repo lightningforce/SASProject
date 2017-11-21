@@ -8,14 +8,72 @@ Traverser: Traverser invoked.  MPCONNECT command is sas.
 Traverser: Beginning flow traversal 
 *------------------------------------------------------------* 
 * 
-* Ids : Beginning Update 
-* datetime : 21NOV2017:18:18:53 
+* Ids2 : Beginning Update 
+* datetime : 21NOV2017:18:50:59 
 * 
 *------------------------------------------------------------* 
-17916      %let _HPDMGRIDHOST=;
-17917      %let _HPDMGRIDINSTALLLOC=;
-17918      %let _HPDMGRIDDATASERVER=;
-17919      %hpdm_gridSetOPtions;
+21726      *------------------------------------------------------------*;
+21727      * Ids2: Update Variables Set;
+21728      *------------------------------------------------------------*;
+
+21729      data EMWS2.Ids2_VariableSet;
+21730      length ROLE $32;
+21731      length LEVEL $10;
+21732      length REPORT $1;
+21733      label REPORT = "Report";
+21734      length ORDER $8;
+21735      length DROP $1;
+21736      length LOWERLIMIT 8;
+21737      length UPPERLIMIT 8;
+21738      set EMWS2.Ids2_EMCMETADEFAULT;
+21739      run;
+
+NOTE: There were 3 observations read from the data set EMWS2.IDS2_EMCMETADEFAULT.
+NOTE: The data set EMWS2.IDS2_VARIABLESET has 3 observations and 21 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+21740      * Ids2: End of Update Variables Set;
+21741      *------------------------------------------------------------*;
+
+21742      *------------------------------------------------------------*;
+21743      * Ids2: Computing metadata for DATA data;
+21744      *------------------------------------------------------------*;
+
+21754      data EMWS2.Ids2_EMINFO;
+21755      length TARGET KEY $32 DATA $43;
+21756      TARGET="";
+21757      KEY="IDSTABLE";
+21758      DATA="DATA.BANK";
+21759      output;
+21760      run;
+
+NOTE: The data set EMWS2.IDS2_EMINFO has 1 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+21761      data EMWS2.Ids2_CMeta_DATA;
+21762      set EMWS2.Ids2_VariableSet;
+21763      drop DROP;
+21764      where DROP='N';
+21765      run;
+
+NOTE: There were 3 observations read from the data set EMWS2.IDS2_VARIABLESET.
+      WHERE DROP='N';
+NOTE: The data set EMWS2.IDS2_CMETA_DATA has 3 observations and 20 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+21767      %let _HPDMGRIDHOST=;
+21768      %let _HPDMGRIDINSTALLLOC=;
+21769      %let _HPDMGRIDDATASERVER=;
+21770      %hpdm_gridSetOPtions;
 
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
@@ -25,247 +83,160 @@ NOTE: DATA statement used (Total process time):
 
 *------------------------------------------------------------* 
 * 
-* Ids : End Update 
-* datetime : 21NOV2017:18:18:53 
+* Ids2 : End Update 
+* datetime : 21NOV2017:18:50:59 
 * 
 *------------------------------------------------------------* 
-Traverser: WaitingNode "CLUS" 
-Traverser: WaitingNode "PROF" 
 traverser_readyNode_note 
 *------------------------------------------------------------* 
 * 
-* Filter : Beginning Update 
-* datetime : 21NOV2017:18:18:54 
+* Assoc : Beginning Update 
+* datetime : 21NOV2017:18:51:00 
 * 
 *------------------------------------------------------------* 
-17939      %let _HPDMGRIDHOST=;
-17940      %let _HPDMGRIDINSTALLLOC=;
-17941      %let _HPDMGRIDDATASERVER=;
-17942      %hpdm_gridSetOPtions;
+21786      *------------------------------------------------------------*;
+21787      * Assoc: Update Variables Set;
+21788      *------------------------------------------------------------*;
 
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-
-*------------------------------------------------------------* 
-* 
-* Filter : End Update 
-* datetime : 21NOV2017:18:18:54 
-* 
-*------------------------------------------------------------* 
-Traverser: WaitingNode "PROF" 
-traverser_readyNode_note 
-*------------------------------------------------------------* 
-* 
-* Clus : Beginning Update 
-* datetime : 21NOV2017:18:18:54 
-* 
-*------------------------------------------------------------* 
-17962      %let _HPDMGRIDHOST=;
-17963      %let _HPDMGRIDINSTALLLOC=;
-17964      %let _HPDMGRIDDATASERVER=;
-17965      %hpdm_gridSetOPtions;
-
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-
-*------------------------------------------------------------* 
-* 
-* Clus : End Update 
-* datetime : 21NOV2017:18:18:55 
-* 
-*------------------------------------------------------------* 
-traverser_readyNode_note 
-*------------------------------------------------------------* 
-* 
-* Prof : Beginning Update 
-* datetime : 21NOV2017:18:18:55 
-* 
-*------------------------------------------------------------* 
-17996      data _null_;
-17997      set EMWS2.Clus_CMeta_TRAIN (obs=1);
-17998      run;
-
-NOTE: There were 1 observations read from the data set EMWS2.CLUS_CMETA_TRAIN.
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-17999      *------------------------------------------------------------*;
-18000      * Prof: Update Variables Set;
-18001      *------------------------------------------------------------*;
-
-18002      data EMWS2.Prof_VariableSet;
-18003      length USE $1;
-18004      label USE = "Use";
-18005      length REPORT $1;
-18006      label REPORT = "Report";
-18007      set EMWS2.Clus_CMeta_TRAIN;
-18008      run;
+21789      data EMWS2.Assoc_VariableSet;
+21790      length USE $1;
+21791      label USE = "Use";
+21792      set EMWS2.Ids2_CMeta_DATA;
+21793      where((ROLE ="TARGET" and level ne "INTERVAL" ) or role in("ID" "SEQUENCE"));
+21794      run;
 
 NOTE: Variable USE is uninitialized.
-NOTE: There were 10 observations read from the data set EMWS2.CLUS_CMETA_TRAIN.
-NOTE: The data set EMWS2.PROF_VARIABLESET has 10 observations and 21 variables.
+NOTE: There were 3 observations read from the data set EMWS2.IDS2_CMETA_DATA.
+      WHERE ((ROLE='TARGET') and (level not = 'INTERVAL')) or role in ('ID', 'SEQUENCE');
+NOTE: The data set EMWS2.ASSOC_VARIABLESET has 3 observations and 21 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+21795      * Assoc: End of Update Variables Set;
+21796      *------------------------------------------------------------*;
+
+21797      *------------------------------------------------------------*;
+21798      * Assoc: Computing metadata for TRAIN data;
+21799      *------------------------------------------------------------*;
+
+21800      data EMWS2.Assoc_EMINFO;
+21801      length TARGET KEY $32 DATA $43;
+21802      TARGET='';
+21803      KEY='ASSOCIATION';
+21804      DATA="Assoc";
+21805      output;
+21806      run;
+
+NOTE: The data set EMWS2.ASSOC_EMINFO has 1 observations and 3 variables.
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
       cpu time            0.00 seconds
       
 
-18009      * Prof: End of Update Variables Set;
-18010      *------------------------------------------------------------*;
+21807      *------------------------------------------------------------*;
+21808      * Assoc: Computing metadata for RULES data;
+21809      *------------------------------------------------------------*;
 
-18011      *------------------------------------------------------------*;
-18012      * Prof: Computing metadata for TRAIN data;
-18013      *------------------------------------------------------------*;
+21810      data EMWS2.Assoc_EMINFO;
+21811      length TARGET KEY $32 DATA $43;
+21812      TARGET='';
+21813      KEY='ASSOCIATION';
+21814      DATA="Assoc";
+21815      output;
+21816      run;
 
-PERFORMANCE  DETAILS
-18220      %let emexceptionString =;
-18221      %let EMEXCEPTIONSTRING=;
-18222      *------------------------------------------------------------*;
-18223      * UPDATE: Prof;
-18224      *------------------------------------------------------------*;
-18225      %let EM_ACTION = UPDATE;
-18226      %let syscc = 0;
-18227      %macro main;
-18228         %if %sysfunc(indexw(&EM_DEBUG, _ALL_)) or %sysfunc(indexw(&EM_DEBUG, SOURCE)) %then %do;
-18229             options MPRINT;
-18230         %end;
-18231      
-18232         filename temp catalog 'sashelp.emexpl.profile_macros.source';
-18233         %include temp;
-18234         filename temp;
-18235      
-18236         /* Initialize property macro variables */
-18237         %SetProperties;
-18238      
-18239         %if %upcase(&EM_ACTION) = CREATE %then %do;
-18240      
-18241             filename temp catalog 'sashelp.emexpl.profile_create.source';
-18242             %include temp;
-18243             filename temp;
-18244             %create;
-18245         %end;
-18246         %else
-18247         %if %upcase(&EM_ACTION) = TRAIN %then %do;
-18248      
-18249             filename temp catalog 'sashelp.emexpl.profile_train.source';
-18250             %include temp;
-18251             filename temp;
-18252             %train;
-18253         %end;
-18254      %mend main;
-18255      
-18256      %main;
-NOTE: %INCLUDE (level 1) file TEMP is file SASHELP.EMEXPL.PROFILE_MACROS.SOURCE.
-18257     +%macro SetProperties;
-18258     +   %em_checkmacro(name=EM_PROPERTY_PROFILEALL,         global=Y, value=N);
-18259     +   %em_checkmacro(name=EM_PROPERTY_USEREPORTVARS,      global=Y, value=Y);
-18260     +   %em_checkmacro(name=EM_PROPERTY_OTHERPERCENTCUTOFF, global=Y, value=95);
-18261     +   %em_checkmacro(name=EM_PROPERTY_TARGETROLE,         global=Y, value=NONE);
-18262     +   %em_checkmacro(name=EM_PROPERTY_NUMHISTBARS,        global=Y, value=8);
-18263     +   %em_checkmacro(name=EM_PROPERTY_MINWORTH,           global=Y, value=0.01);
-18264     +   %em_checkmacro(name=EM_PROPERTY_MAXDEPTH,           global=Y, value=1);
-18265     +   %em_checkmacro(name=EM_PROPERTY_MAXNUMREPORT,       global=Y, value=10);
-18266     +   %em_checkmacro(name=EM_PROPERTY_MAXNUMINPUT,        global=Y, value=10);
-18267     +   %em_checkmacro(name=EM_PROPERTY_PRINTWORTH,         global=Y, value=Y);
-18268     +%mend SetProperties;
-18269     +
-18270     +
-18271     +%macro makeVarMacros(level= );
-18272     +
-18273     +    %let numvars = 0;
-18274     +    %let where   = '';
-18275     +
-18276     +    %if (%upcase(&EM_PROPERTY_TARGETROLE) eq INPUT) %then
-18277     +        %let where = (ROLE = 'REJECTED' and LEVEL="&level" and USE='Y') or (ROLE in('INPUT', 'TARGET') and LEVEL="&level"  and USE in('Y', 'D'));
-18278     +    %else
-18279     +        %let where = (ROLE = 'REJECTED' and LEVEL="&level" and USE='Y') or (ROLE ='INPUT' and LEVEL="&level" and USE in('Y', 'D'));
-18280     +
-18281     +    %if &level = INTERVAL %then %do;
-18282     +        %let numvars = %eval( &EM_NUM_INTERVAL_INPUT + &EM_NUM_INTERVAL_REJECTED);
-18283     +        %if (%upcase(&EM_PROPERTY_TARGETROLE) eq INPUT) %then
-18284     +             %let numvars = %eval(&numvars + &EM_NUM_INTERVAL_TARGET);
-18285     +    %end;
-18286     +    %else %do;
-18287     +        %if &level = NOMINAL %then %do;
-18288     +            %let numvars = %eval(&EM_NUM_BINARY_INPUT + &EM_NUM_NOMINAL_INPUT +  &EM_NUM_BINARY_REJECTED + &EM_NUM_NOMINAL_REJECTED);
-18289     +             %if (%upcase(&EM_PROPERTY_TARGETROLE) eq INPUT) %then %do;
-18290     +                 %let numvars = %eval(&numvars + &EM_NUM_BINARY_TARGET + &EM_NUM_NOMINAL_TARGET);
-18291     +                 %let where = (ROLE = 'REJECTED' and LEVEL in('NOMINAL', 'BINARY') and USE='Y') or (ROLE in('INPUT', 'TARGET') and LEVEL in('NOMINAL', 'BINARY') and USE in('Y', 'D'));
-18292     +             %end;
-18293     +             %else
-18294     +                 %let where = (ROLE = 'REJECTED' and LEVEL in('NOMINAL', 'BINARY') and USE='Y') or (ROLE ='INPUT' and LEVEL in("NOMINAL", "BINARY") and USE in('Y', 'D'));
-18295     +
-18296     +        %end;
-18297     +        %else %do;
-18298     +            %let numvars = %eval(&EM_NUM_ORDINAL_INPUT + &EM_NUM_ORDINAL_REJECTED);
-18299     +            %if (%upcase(&EM_PROPERTY_TARGETROLE) eq INPUT) %then
-18300     +                %let numvars = %eval(&numvars + &EM_NUM_ORDINAL_TARGET);
-18301     +        %end;
-18302     +    %end;
-18303     +
-18304     +    %if &numvars>0 %then %do;
-18305     +         %let numloop = %sysfunc(ceil(&numvars/10000));
-18306     +         %let loopcount = 0;
-18307     +
-18308     +         %do %while((&numloop - &loopcount) > 0);
-18309     +             %let first = %eval((&loopcount*10000) + 1);
-18310     +             %let last  = %eval(&first + 10000);
-18311     +             %let loopcount = %eval(&loopcount +1);
-18312     +             %let centry = &EM_LIB..&EM_NODEID._MACS.&LEVEL._&loopcount..SOURCE;
-18313     +             filename X catalog "&centry";
-18314     +             data _null_;
-18315     +                length _STRING_ $80;
-18316     +                retain _STRING_ ;
-18317     +                file X;
-18318     +                set &EM_DATA_VARIABLESET(firstobs=&first obs=&last) end=eof;
-18319     +
-18320     +                where &where;
-18321     +
-18322     +                if _N_=1 then
-18323     +                   put '%macro _PROFVAR;';
-18324     +
-18325     +                if (length(_STRING_) + length(trim(NAME))+ 1  < 80) then do;
-18326     +                   _STRING_ = trim(_STRING_)!!' '!!trim(NAME);
-18327     +                   if eof then do;
-18328     +                      put _STRING_;
-18329     +                      put '%mend _PROFVAR;';
-18330     +                   end;
-18331     +                end;
-18332     +                else do;
-18333     +                   put _STRING_;
-18334     +                  _string_ = TRIM(NAME);
-18335     +                   if eof then do;
-18336     +                      put _string_;
-18337     +                      put '%mend _PROFVAR;';
-18338     +                   end;
-18339     +                end;
-18340     +             run;
-18341     +             filename X;
-18342     +         %end;
-18343     +    %end;
-18344     +
-18345     +%mend makeVarMacros;
-18346     +
-18347     +
-NOTE: %INCLUDE (level 1) ending.
-NOTE: Fileref TEMP has been deassigned.
-18348      *------------------------------------------------------------*;
-18349      * End UPDATE: Prof;
-18350      *------------------------------------------------------------*;
+NOTE: The data set EMWS2.ASSOC_EMINFO has 1 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
 
-18351      %em_delMacro;
+21817      *------------------------------------------------------------*;
+21818      * Assoc: Computing metadata for TRANSACTION data;
+21819      *------------------------------------------------------------*;
 
-18353      %let _HPDMGRIDHOST=;
-18354      %let _HPDMGRIDINSTALLLOC=;
-18355      %let _HPDMGRIDDATASERVER=;
-18356      %hpdm_gridSetOPtions;
+21820      *------------------------------------------------------------*;
+21821      * Assoc: Create Metadata;
+21822      *------------------------------------------------------------*;
+21823      data EMWS2.Assoc_CMeta_TRANSACTION;
+21824      set EMWS2.Ids2_CMeta_DATA;
+21825      run;
+
+NOTE: There were 3 observations read from the data set EMWS2.IDS2_CMETA_DATA.
+NOTE: The data set EMWS2.ASSOC_CMETA_TRANSACTION has 3 observations and 20 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+21826      data EMWS2.Assoc_EMINFO;
+21827      length TARGET KEY $32 DATA $43;
+21828      TARGET='';
+21829      KEY='ASSOCIATION';
+21830      DATA="Assoc";
+21831      output;
+21832      run;
+
+NOTE: The data set EMWS2.ASSOC_EMINFO has 1 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+21833      proc sort data = EMWS2.Ids2_EMINFO OUT=WORK.SORTEDEMINFO NOTHREADS;
+21834      by TARGET KEY;
+21835      run;
+
+NOTE: There were 1 observations read from the data set EMWS2.IDS2_EMINFO.
+NOTE: The data set WORK.SORTEDEMINFO has 1 observations and 3 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+21836      proc sort data = EMWS2.Assoc_EMINFO OUT=WORK.TEMP_INFO NOTHREADS;
+21837      by TARGET KEY;
+21838      run;
+
+NOTE: There were 1 observations read from the data set EMWS2.ASSOC_EMINFO.
+NOTE: The data set WORK.TEMP_INFO has 1 observations and 3 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+21839      data EMWS2.Assoc_EMINFO;
+21840      merge WORK.SORTEDEMINFO WORK.TEMP_INFO;
+21841      by TARGET KEY;
+21842      run;
+
+NOTE: There were 1 observations read from the data set WORK.SORTEDEMINFO.
+NOTE: There were 1 observations read from the data set WORK.TEMP_INFO.
+NOTE: The data set EMWS2.ASSOC_EMINFO has 2 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+21843      proc datasets lib=work nolist;
+21844      delete TEMP_INFO SORTEDEMINFO;
+21845      run;
+
+NOTE: Deleting WORK.TEMP_INFO (memtype=DATA).
+NOTE: Deleting WORK.SORTEDEMINFO (memtype=DATA).
+21846      quit;
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+21848      %let _HPDMGRIDHOST=;
+21849      %let _HPDMGRIDINSTALLLOC=;
+21850      %let _HPDMGRIDDATASERVER=;
+21851      %hpdm_gridSetOPtions;
 
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
@@ -275,11 +246,11 @@ NOTE: DATA statement used (Total process time):
 
 *------------------------------------------------------------* 
 * 
-* Prof : End Update 
-* datetime : 21NOV2017:18:18:55 
+* Assoc : End Update 
+* datetime : 21NOV2017:18:51:00 
 * 
 *------------------------------------------------------------* 
 Traverser: Run Completed 
-18357      proc printto;
-18358      run;
+21852      proc printto;
+21853      run;
 
