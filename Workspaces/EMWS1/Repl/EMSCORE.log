@@ -1,0 +1,1700 @@
+*------------------------------------------------------------*
+* Score Log
+Date:                September 29, 2017
+Time:                19:41:28
+*------------------------------------------------------------*
+16289  %let EMEXCEPTIONSTRING=;
+16290  *------------------------------------------------------------*;
+16291  * SCORE: Repl;
+16292  *------------------------------------------------------------*;
+16293  %let EM_ACTION = SCORE;
+16294  %let syscc = 0;
+16295  filename x CATALOG 'SASHELP.EMUTIL.EM_VARMACRO.SOURCE';
+16296  %inc x;
+NOTE: %INCLUDE (level 1) file X is file SASHELP.EMUTIL.EM_VARMACRO.SOURCE.
+16298 +%macro em_varMacro(name=emMacro, metadata=, where=, key=NAME, nummacro=, maxvar=-1);
+16300 +   filename macFile catalog 'work.emutil.macro.source';
+16301 +   %let _METAOBS = 0;
+16302 +   %let _maxvar = &maxvar;
+16303 +   %if "&_maxvar" eq "" %then %let maxvar = -1;
+16305 +   %if (%sysfunc(exist(&metadata))<1 and %sysfunc(exist(&metadata, VIEW))<1)
+16306 +                   or (&metadata eq ) %then %do;
+16307 +       %put * No metadata data set defined;
+16308 +       %goto doend;
+16309 +   %end;
+16311 +   data _null_;
+16312 +      length _STRING_ $80;
+16313 +      retain _STRING_ '' maxvar 0;
+16314 +      set &metadata end=eof;
+16315 +      file macFile;
+16316 +      %if %nrbquote(&where) ne %then %do;
+16317 +          %let whereClause = where (%nrbquote(&where));
+16318 +          %unquote(&whereClause);
+16319 +      %end;
+16320 +      if _N_=1 then do;
+16321 +         string = "%"!!"macro &name;";
+16322 +         put string;
+16323 +      end;
+16324 +      maxvar +1;
+16325 +      if (length(_STRING_) + length(trim(&key))+ 4 < 80) then do;
+16326 +         _STRING_ = trim(_STRING_)!!' '!!trim(&key);
+16327 +         if eof
+16328 +            %if  %sysevalf(&_maxvar > 0) %then %do;
+16329 +                or maxvar >= &maxvar
+16330 +            %end;
+16331 +            then do;
+16332 +            put _STRING_;
+16333 +            string = "%"!!"mend &name;";
+16334 +            put string;
+16335 +            string = strip(put(_N_, best.));
+16336 +            call symput('_METAOBS', string);
+16337 +            %if (&nummacro ne ) %then %do;
+16338 +                put "%" "global &nummacro;";
+16339 +                put "%" "let &nummacro = " string ";";
+16340 +            %end;
+16341 +            stop;
+16342 +         end;
+16343 +      end;
+16344 +      else do;
+16345 +         put _STRING_;
+16346 +         _string_ = TRIM(&key);
+16347 +         if eof
+16348 +            %if  %sysevalf(&_maxvar > 0) %then %do;
+16349 +              or maxvar >= &maxvar
+16350 +           %end;
+16351 +            then do;
+16352 +            put _STRING_;
+16353 +            string = "%"!!"mend &name;";
+16354 +            put string;
+16355 +        end;
+16356 +      end;
+16357 +      if eof
+16358 +         %if  %sysevalf(&_maxvar > 0) %then %do;
+16359 +             or maxvar >= &maxvar
+16360 +         %end;
+16361 +         then do;
+16362 +         string = strip(put(_N_, best.));
+16363 +         call symput('_METAOBS', string);
+16364 +         %if (&nummacro ne ) %then %do;
+16365 +             put "%" "global &nummacro;";
+16366 +             put "%" "let &nummacro = " string ";";
+16367 +         %end;
+16368 +         stop;
+16369 +      end;
+16370 +   run;
+16372 +   %doend:
+16373 +   %if ^&_METAOBS %then %do;
+16374 +       data _null_;
+16375 +          file macFile;
+16376 +          put "%" "macro &name;";
+16377 +          put "%" "mend &name;";
+16378 +          %if (&nummacro ne ) %then %do;
+16379 +              put "%" "global &nummacro;";
+16380 +              put "%" "let &nummacro = 0;";
+16381 +          %end;
+16382 +      run;
+16383 +   %end;
+16384 +   %inc macFile;
+16385 +   filename macFile;
+16386 +%mend em_varMacro;
+NOTE: %INCLUDE (level 1) ending.
+16387  filename X;
+NOTE: Fileref X has been deassigned.
+16388   %macro main;
+16389  
+16390     filename temp catalog 'sashelp.emmdfy.Replace_macros.source';
+16391     %include temp;
+16392     filename temp;
+16393  
+16394     %if %upcase(&EM_ACTION) = CREATE %then %do;
+16395  
+16396         filename temp catalog 'sashelp.emmdfy.Replace_create.source';
+16397         %include temp;
+16398         filename temp;
+16399         %create;
+16400     %end;
+16401     %else
+16402     %if %upcase(&EM_ACTION) = TRAIN %then %do;
+16403  
+16404         filename temp catalog 'sashelp.emmdfy.Replace_train.source';
+16405         %include temp;
+16406         filename temp;
+16407         %train;
+16408     %end;
+16409     %else
+16410     %if %upcase(&EM_ACTION) = SCORE %then %do;
+16411  
+16412         filename temp catalog 'sashelp.emmdfy.Replace_score.source';
+16413         %include temp;
+16414         filename temp;
+16415         %score;
+16416     %end;
+16417     %if %upcase(&EM_ACTION) = REPORT %then %do;
+16418  
+16419         filename temp catalog 'sashelp.emmdfy.Replace_report.source';
+16420         %include temp;
+16421         filename temp;
+16422         %report;
+16423     %end;
+16424     %if %upcase(&EM_ACTION) = OPENOUTCLASSTABLE %then %do;
+16425         filename temp catalog 'sashelp.emmdfy.replace_makeoutclass.source';
+16426         %include temp;
+16427         filename temp;
+16428         %em_replace_openoutclass;
+16429     %end;
+16430     %if %upcase(&EM_ACTION) = CLOSEOUTCLASSTABLE %then %do;
+16431         filename temp catalog 'sashelp.emmdfy.replace_makeoutclass.source';
+16432         %include temp;
+16433         filename temp;
+16434         %em_replace_closeoutclass;
+16435     %end;
+16436  %mend main;
+16437  
+16438  %main;
+NOTE: %INCLUDE (level 1) file TEMP is file SASHELP.EMMDFY.REPLACE_MACROS.SOURCE.
+16439 +%macro SetProperties;
+16440 +   %em_checkmacro(name=EM_PROPERTY_UNKNOWNLEVEL,    global=Y, value=MODE);
+16441 +   %em_checkmacro(name=EM_PROPERTY_CALCMETHOD,      global=Y, value=NONE);
+16442 +   %em_checkmacro(name=EM_PROPERTY_PERCENTSCUTOFF,  global=Y, value=0.5);
+16443 +   %em_checkmacro(name=EM_PROPERTY_SPACINGSCUTOFF,  global=Y, value=9);
+16444 +   %em_checkMacro(name=EM_PROPERTY_MADSCUTOFF,      global=Y, value=9);
+16445 +   %em_checkMacro(name=EM_PROPERTY_STDDEVCUTOFF,    global=Y, value=3);
+16446 +   %em_checkmacro(name=EM_PROPERTY_REPLACEMETHOD,   global=Y, value=COMPUTED);
+16447 +   %em_checkmacro(name=EM_PROPERTY_HIDEVARIABLE,    global=Y, value=N);
+16448 +   %em_checkmacro(name=EM_PROPERTY_INTERVALMETHOD,  global=Y, value=NONE);
+16449 +   %em_checkmacro(name=EM_PROPERTY_REPORTCOUNT,     global=Y, value=Y);
+16450 +
+16451 +%mend SetProperties;
+16452 +
+NOTE: %INCLUDE (level 1) ending.
+NOTE: Fileref TEMP has been deassigned.
+NOTE: %INCLUDE (level 1) file TEMP is file SASHELP.EMMDFY.REPLACE_SCORE.SOURCE.
+16453 +%macro makeLevelData(data=, outclass=);
+16454 +   data REPLACE_MODE;
+16455 +      set &OUTCLASS;
+16456 +      by NAME;
+16457 +      if first.name then do;
+16458 +         MODEC    = CRAW;
+16459 +         MODEN    = NRAW;
+16460 +         NORMMODE = LEVEL;
+16461 +         output;
+16462 +      end;
+16463 +      keep NAME MODEC MODEN NORMMODE UNKWOWNDEFAULT;
+16464 +   run;
+16466 +   proc sort data=&EM_DATA_VARIABLESET;
+16467 +      by NAME;
+16468 +   run;
+16469 +   data &data;
+16470 +      length UNKWOWNDEFAULT $8;
+16471 +      merge &OUTCLASS(in=_a) REPLACE_MODE &EM_DATA_VARIABLESET(keep=LABEL LENGTH NAME ROLE LEVEL LABEL FORMAT RENAME=(LEVEL=MLEVEL) where=(MLEVEL ne 'INTERVAL'));
+16472 +      by NAME;
+16473 +      if LEVEL = '_UNKNOWN_' then UNKWOWNDEFAULT = "&EM_PROPERTY_UNKNOWNLEVEL";
+16474 +      if _a then output;
+16475 +   run;
+16476 +   proc datasets lib=work nolist;
+16477 +      delete REPLACE_MODE;
+16478 +   run;
+16479 +   quit;
+16480 +%mend makeLevelData;
+16482 +%macro makeNewNames(limitDs=, classValue=, className=);
+16483 +     %let varname = invarname;
+16484 +     %let newname = outname;
+16485 +     proc sort data=&classValue out=&varname nodupkey;
+16486 +        by NAME;
+16487 +        where REPLACE_VALUE ^in('', '_DEFAULT_') or (REPLACE_VALUE eq '_DEFAULT_' and UNKWOWNDEFAULT ne 'NONE');
+16488 +     run;
+16489 +     %let classnum=0;
+16490 +     %let dsid = %sysfunc(open(&varname));
+16491 +     %if &dsid>0 %then %do;
+16492 +         %let classnum = %sysfunc(attrn(&dsid, NOBS));
+16493 +         %let dsid = %sysfunc(close(&dsid));
+16494 +     %end;
+16496 +     %let varnum=0;
+16497 +     %let dsid = %sysfunc(open(&LimitDs));
+16498 +     %if &dsid>0 %then %do;
+16499 +         %let varnum = %sysfunc(attrn(&dsid, NOBS));
+16500 +         %let dsid = %sysfunc(close(&dsid));
+16501 +     %end;
+16503 +     %if ^&classnum and ^&varnum and ^%sysfunc(exist(&classname)) %then %do;
+16504 +         %let lib    = %scan(&classname, 1, .);
+16505 +         %let member = %scan(&classname, 2, .);
+16506 +          proc datasets lib=&lib nolist;
+16507 +             delete &member;
+16508 +          run;
+16509 +          quit;
+16510 +         %goto doendmn;
+16511 +     %end;
+16513 +     data &varname;
+16514 +        set
+16515 +        %if &classnum %then %do;
+16516 +            &varname(keep=NAME)
+16517 +        %end;
+16518 +        %if &varnum %then %do;
+16519 +            &limitDs(keep=NAME)
+16520 +        %end;
+16521 +        ;
+16522 +     run;
+16523 +     proc dmdb data=&varname outtable=&newname(rename=(REP=NEWNAME)) nameserver;
+16524 +        names NAME;
+16525 +        prefix REP_;
+16526 +     run;
+16527 +     proc sort data=&newname;
+16528 +        by NAME;
+16529 +     run;
+16531 +     /* Merge the new names with the limits data set */
+16532 +     %if %sysfunc(exist(&limitDs)) %then %do;
+16533 +         data &limitDs;
+16534 +            merge &newname &limitDs(in=a);
+16535 +            by NAME;
+16536 +            if a then output;
+16537 +         run;
+16539 +         %let lib    = %scan(&limitDs, 1, .);
+16540 +         %let member = %scan(&limitDs, 2, .);
+16541 +          proc datasets lib=&lib nolist;
+16542 +             modify &member;
+16543 +             label NAME    =     "%sysfunc(sasmsg(sashelp.dmine, rpt_variable_vlabel, NOQUOTE))"
+16544 +              NEWNAME =     "%sysfunc(sasmsg(sashelp.dmine, rpt_replacevar_vlabel, NOQUOTE))"
+16545 +              CALCMETHOD =  "%sysfunc(sasmsg(sashelp.dmine, rpt_calcmethod_vlabel , NOQUOTE))"
+16546 +              REPLACEMETHODUSED =  "%sysfunc(sasmsg(sashelp.dmine, rpt_replacemethodused_vlabel, NOQUOTE))"
+16547 +              LOWERLIMIT        =  "%sysfunc(sasmsg(sashelp.dmine, meta_lowerLimit_vlabel, NOQUOTE))"
+16548 +              REPLACEMINUSED    =  "%sysfunc(sasmsg(sashelp.dmine, rpt_replacemin_vlabel, NOQUOTE))"
+16549 +              UPPERLIMIT        =  "%sysfunc(sasmsg(sashelp.dmine, meta_upperLimit_vlabel, NOQUOTE))"
+16550 +              REPLACEDMAXUSED   =  "%sysfunc(sasmsg(sashelp.dmine, rpt_replacemax_vlabel, NOQUOTE))"
+16551 +              REPLACEMETHOD     =  "%sysfunc(sasmsg(sashelp.dmine, rpt_replacemethod_vlabel, NOQUOTE))"
+16552 +              REPLACEMIN =  "%sysfunc(sasmsg(sashelp.dmine, rpt_userreplacemin_vlabel, NOQUOTE))"
+16553 +              REPLACEMAX =  "%sysfunc(sasmsg(sashelp.dmine, rpt_userreplacemax_vlabel, NOQUOTE))"
+16554 +              ROLE       =  "%sysfunc(sasmsg(sashelp.dmine, meta_role_vlabel, NOQUOTE))"
+16555 +              LEVEL      =  "%sysfunc(sasmsg(sashelp.dmine, meta_level_vlabel, NOQUOTE))"
+16556 +              LABEL      =  "%sysfunc(sasmsg(sashelp.dmine, meta_label_vlabel, NOQUOTE))";
+16557 +         run;
+16558 +         quit;
+16559 +     %end;
+16561 +     /* Merge the new names with the Class Value data set */
+16562 +     %if %sysfunc(exist(&classValue)) %then %do;
+16563 +         data length;
+16564 +            retain newlen 0;
+16565 +            set &classValue;
+16566 +            by NAME;
+16567 +            if type eq 'C' then do;
+16568 +               if first.name then do;
+16569 +                  if REPLACE_VALUE ^in('_DEFAULT_', '_MODE_', '_MISSING_') then
+16570 +                     newlen = max(length, length(strip(replace_value)));
+16571 +                  else
+16572 +                     newlen = length;
+16573 +               end;
+16574 +               else do;
+16575 +                  if REPLACE_VALUE ^in('_DEFAULT_', '_MODE_', '_MISSING_') then
+16576 +                     newlen = max(newlen, length(strip(replace_value)));
+16577 +               end;
+16578 +            end;
+16579 +            else newlen = length;
+16580 +            len=length;
+16581 +            if last.name then output;
+16582 +            keep name len newlen role format type label mlevel;
+16583 +         run;
+16584 +         data &className;
+16585 +            length rformat formatroot $32;
+16586 +            merge &newname(in=a) length(in=b);
+16587 +            by NAME;
+16588 +            length=len;
+16589 +            if newlen > len then do;
+16590 +               if type eq 'C' and format ne '' then do;
+16591 +                  rformat = strip(reverse(format));
+16592 +                  do while(indexc(rformat, '.0123456789')=1);
+16593 +                     rformat = substr(rformat, 2);
+16594 +                  end;
+16595 +                  formatroot= upcase(reverse(rformat));
+16596 +                  if strip(formatRoot) in('$','$F','$UPCASE','$CHAR') then do;
+16597 +                     format = strip(formatroot)!!strip(put(newlen, best.))!!'.';
+16598 +                  end;
+16599 +               end;
+16600 +               length = newlen;
+16601 +            end;
+16602 +            if a and b then output;
+16603 +            KEEP name newname role format mlevel type label length;
+16604 +         run;
+16605 +     %end;
+16607 +     proc datasets lib=work nolist;
+16608 +        delete length &varname &newname;
+16609 +     run;
+16610 +     quit;
+16612 +     %doendmn:
+16614 +%mend makeNewNames;
+16616 +%macro makeVarDeltaCode(LimitDs=);
+16617 +    %if ^%sysfunc(exist(&LimitDs)) %then %goto doendd;
+16619 +    filename _F1 "&EM_FILE_CDELTA_TRAIN";
+16620 +     data _null_;
+16621 +        set &LimitDs end=eof;
+16622 +        length string $400;
+16623 +        file _F1;
+16624 +        %if &EM_PROPERTY_HIDEVARIABLE eq Y %then %do;
+16625 +            string = 'if NAME="'!!strip(NAME)!!'" then delete;';  put string;
+16626 +        %end;
+16627 +        %else %do;
+16628 +            string = 'if NAME="'!!strip(NAME)!!'" then do;';        put string;
+16629 +            string = '   ROLE="REJECTED";';                         put string;
+16630 +            string = '   COMMENT= "Replaced by '!!"&EM_NODEID"!!'";'; put string;
+16631 +            string = 'end;';                                        put string;
+16632 +        %end;
+16633 +        put 'else';
+16634 +        string = '   if NAME="'!!strip(NEWNAME)!!'" then do;'; put string;
+16635 +        string = '      ROLE="'!!strip(ROLE)!!'";';            put string;
+16636 +        string = '      LEVEL="'!!strip(LEVEL)!!'";';          put string;
+16637 +        put      'end;';
+16638 +        if ^eof then
+16639 +           put 'else';
+16640 +   run;
+16641 +   filename _F1;
+16643 +    %doendd:
+16644 +%mend makeVarDeltaCode;
+16646 +%macro makeVarScoreCode(LimitDs=, File=);
+16647 +    %if ^%sysfunc(exist(&LimitDs)) or "&File" eq "" %then %goto doendm;
+16649 +     filename sFile "&file";
+16650 +     data &LimitDs;
+16651 +        set &LimitDs end=eof;
+16652 +        length REPLACEMETHODUSED $8 string $400;
+16653 +        file sFile;
+16654 +        put'* ;';
+16655 +        put'* Variable: ' name ';';
+16656 +        put '* ;';
+16657 +        if strip(label) = '' then label = name;
+16658 +        string= 'Label '!!strip(newname)!!"='Replacement: "!!strip(tranwrd(label, "'","''"))!!"';";
+16659 +        put string;
+16660 +        string= 'Length '!!strip(newname)!!' 8;';
+16661 +        put string;
+16662 +        put newname '=' name ';';
+16663 +        REPLACEMETHODUSED = REPLACEMETHOD;
+16664 +        if REPLACEMETHOD = 'DEFAULT' then
+16665 +            %if "&EM_PROPERTY_REPLACEMETHOD" = "COMPUTED" %then %do;
+16666 +                REPLACEMETHODUSED = 'COMPUTED';
+16667 +            %end;
+16668 +            %else
+16669 +            %if "&EM_PROPERTY_REPLACEMETHOD" = "MISSING" %then %do;
+16670 +                REPLACEMETHODUSED = 'MISSING';
+16671 +            %end;
+16672 +            %else %do;
+16673 +                REPLACEMETHODUSED = 'MANUAL';
+16674 +            %end;
+16676 +        put 'if ' name ' eq . then ' newname  '= . ;';
+16677 +        if LowerLimit ne . then do;
+16678 +           select(REPLACEMETHODUSED);
+16679 +              when('COMPUTED') REPLACEMINUSED = lowerLimit;
+16680 +              when('MISSING')  REPLACEMINUSED = .;
+16681 +              when('MANUAL')   REPLACEMINUSED = replaceMin;
+16682 +              otherwise;
+16683 +           end;
+16684 +           put 'else';
+16685 +           put 'if ' name '<' lowerLimit ' then ' newname ' = ' REPLACEMINUSED ';';
+16686 +        end;
+16687 +        if upperLimit ne . then do;
+16688 +           select(REPLACEMETHODUSED);
+16689 +              when('COMPUTED') REPLACEMAXUSED = upperLimit;
+16690 +              when('MISSING')  REPLACEMAXUSED = .;
+16691 +              when('MANUAL')   REPLACEMAXUSED = replaceMax;
+16692 +              otherwise;
+16693 +           end;
+16694 +           put 'else';
+16695 +           put 'if ' name '>' upperLimit  ' then ' newname ' = ' REPLACEMAXUSED ';';
+16696 +        end;
+16697 +        drop string;
+16698 +    run;
+16699 +    filename sfile;
+16700 +    %doendm:
+16701 +%mend makeVarScoreCode;
+16704 +%macro makeUnknownOptCode(Folder=, Data=);
+16705 +    %if ^%sysfunc(exist(&Data)) %then %goto doendu;
+16707 +    %let dsid = %sysfunc(open(&data));
+16708 +    %let nameNum    = %sysfunc(varnum(&dsid, Name));
+16709 +    %let newnameNum = %sysfunc(varnum(&dsid, NewName));
+16711 +    %let oldname=;
+16712 +    %do %while(^%sysfunc(fetch(&dsid)));
+16713 +        %let name    = %sysfunc(getvarc(&dsid, &nameNum));
+16714 +        %let newName = %sysfunc(getvarc(&dsid, &newnameNum));
+16716 +        %if &name ne &oldname %then %do;
+16717 +            filename _F1 "&Folder&em_dsep.&newname..sas" MOD;
+16718 +            data _null_;
+16719 +               set &Data end=eof;
+16720 +               where NAME ="&name";
+16721 +               length string $400;
+16722 +               length newlevel replaceLevel $400;
+16723 +               retain string missingFlag;
+16724 +               file _F1;
+16725 +               if _N_=1 then do;
+16726 +                  put '*;';
+16727 +                  if format ne '' then do;
+16728 +                     string = '_UFORMAT200 = '!!'strip(put('!!strip(NAME)!!','!!strip(format)!!'));';
+16729 +                     put string;
+16730 +                     put 'if ^(_UFORMAT200 in(';
+16731 +                  end;
+16732 +                  else do;
+16733 +                     if type eq 'C' then do;
+16734 +                        string = '_UFORMAT200 = '!!'strip('!!strip(NAME)!!');';
+16735 +                        put string;
+16736 +                        put 'if ^(_UFORMAT200 in(';
+16737 +                     end;
+16738 +                     else
+16739 +                        put 'if (';
+16740 +                  end;
+16741 +                  string='';
+16742 +                  missingFlag = 0;
+16743 +               end;
+16745 +               if ^eof and LEVEL ne '_UNKNOWN_' then do;
+16746 +                  if format ne '' or type eq 'C' then do;
+16747 +                     newlevel = tranwrd(strip(LEVEL),'"','""');
+16748 +                     if strip(newLevel) = '' then missingFlag = 1;
+16749 +                     if length(strip(newlevel))+length(strip(string))+4<80 then do;
+16750 +                        if string='' then
+16751 +                           string = strip(string)!!' "'!!strip(newlevel)!!'" ';
+16752 +                        else
+16753 +                           string = strip(string)!!', "'!!strip(newlevel)!!'" ';
+16754 +                     end;
+16755 +                     else do;
+16756 +                        put string;
+16757 +                        string =', "'!!tranwrd(strip(LEVEL),'"','""')!!'"';
+16758 +                     end;
+16759 +                  end;
+16760 +                  else do;
+16761 +                     string = strip(name)!!' ne '!!strip(level)!!' and ';
+16762 +                     put string;
+16763 +                  end;
+16764 +                  newlevel = ' ';
+16765 +               end;
+16766 +               else do;
+16767 +                  if format ne '' or type eq 'C' then do;
+16768 +                     put string;
+16769 +                     if ^missingFlag then
+16770 +                        string = ', "" )) then ';
+16771 +                     else
+16772 +                        string = ')) then ';
+16773 +                  end;
+16774 +                  else
+16775 +                     string = strip(name)!!' ne . ) then ';
+16776 +                  put string;
+16778 +                 select(REPLACE_VALUE);
+16779 +                 when('_MODE_') do;
+16780 +                    if type eq 'C' then
+16781 +                       replaceLevel = NORMMODE;
+16782 +                    else
+16783 +                       replaceLevel =strip(put(MODEN,BEST.));
+16784 +                 end;
+16785 +                 when('_MISSING_') do;
+16786 +                    if type eq 'C' then replaceLevel = '';
+16787 +                    else replaceLevel = '.';
+16788 +                 end;
+16789 +                 when('_DEFAULT_') do;
+16790 +                    %if &EM_PROPERTY_UNKNOWNLEVEL = MODE %then %do;
+16791 +                        if type eq 'C' then
+16792 +                           replaceLevel = NORMMODE;
+16793 +                        else
+16794 +                           replaceLevel = strip(put(MODEN,BEST.));
+16795 +                    %end;
+16796 +                    %else %do;
+16797 +                        if type eq 'C' then replaceLevel = '';
+16798 +                         else replaceLevel = '.';
+16799 +                    %end;
+16800 +                  end;
+16801 +                  when('') do;
+16802 +                  end;
+16803 +                  otherwise do;
+16804 +                     if type eq 'C' then replaceLevel= replace_Value;
+16805 +                     else replaceLevel = replace_Value;
+16806 +                  end;
+16807 +               end;
+16808 +               if type eq 'C' then do;
+16809 +                  string = strip(newname)!!'= "'!!tranwrd(strip(replaceLevel),'"','""')!!'";';
+16810 +               end;
+16811 +               else do;
+16812 +                  string = strip(newname)!!'= '!!strip(replaceLevel)!!';';
+16813 +               end;
+16814 +               put string;
+16815 +            end;
+16817 +           run;
+16818 +           filename _F1;
+16819 +           proc datasets lib=work nolist;
+16820 +              delete _temp;
+16821 +           run;
+16822 +           quit;
+16824 +           %let oldname = &name;
+16825 +        %end;
+16826 +    %end;
+16827 +    %let dsid = %sysfunc(close(&dsid));
+16829 +    %doendu:
+16830 +%mend makeUnknownOptCode;
+16832 +%macro makeUnknownCode(ScoreFile=, Data=);
+16833 +   %if ^%sysfunc(exist(&Data)) %then %goto doendm;
+16835 +   filename _F1 "&ScoreFile" MOD;
+16836 +   data _null_;
+16837 +      set &Data;
+16838 +      length string $400;
+16839 +      length newlevel replaceLevel $200;
+16840 +      retain string missingFlag;
+16841 +      file _F1;
+16842 +      by NAME;
+16844 +      if _N_=1 then do;
+16845 +         put '* ;';
+16846 +         put '* Replace Unknown Class Levels ;';
+16847 +         put '* ;';
+16848 +         put 'length _UFORMAT200 $200;';
+16849 +         put 'drop   _UFORMAT200;';
+16850 +         put '_UFORMAT200 = " ";';
+16851 +      end;
+16853 +      if first.name then do;
+16854 +         missingFlag = 0;
+16855 +         put '*;';
+16857 +         if format ne '' then do;
+16858 +            call symput('UFormatFlag', '1');
+16859 +            string = '_UFORMAT200 = '!!'strip(put('!!strip(NAME)!!','!!strip(format)!!'));';
+16860 +            put string;
+16861 +            put 'if ^(_UFORMAT200 in(';
+16862 +         end;
+16863 +         else do;
+16864 +            if type eq 'C' then do;
+16865 +               call symput('UFormatFlag', '1');
+16866 +               string = '_UFORMAT200 = '!!'strip('!!strip(NAME)!!');';
+16867 +               put string;
+16868 +               put 'if ^(_UFORMAT200 in(';
+16869 +            end;
+16870 +            else
+16871 +               put 'if (';
+16872 +         end;
+16873 +         string='';
+16874 +      end;
+16876 +      if ^last.name and LEVEL ne '_UNKNOWN_' then do;
+16877 +        if format ne '' or type eq 'C' then do;
+16878 +           newlevel = tranwrd(strip(LEVEL),'"','""');
+16879 +           if strip(newLevel) = '' then missingFlag = 1;
+16880 +           if length(strip(newlevel))+length(strip(string))+4<80 then do;
+16881 +              if string='' then
+16882 +                 string = strip(string)!!' "'!!strip(newlevel)!!'" ';
+16883 +              else
+16884 +                 string = strip(string)!!', "'!!strip(newlevel)!!'" ';
+16885 +           end;
+16886 +           else do;
+16887 +              put string;
+16888 +              string =', "'!!tranwrd(strip(LEVEL),'"','""')!!'"';
+16889 +           end;
+16890 +        end;
+16891 +        else do;
+16892 +           string = strip(name)!!' ne '!!strip(level)!!' and ';
+16893 +           put string;
+16894 +        end;
+16895 +        newlevel = ' ';
+16896 +     end;
+16897 +     else do;
+16898 +        if format ne '' or type eq 'C' then do;
+16899 +           put string;
+16900 +           if ^missingFlag then
+16901 +              string = ', "" )) then ';
+16902 +           else
+16903 +              string = ')) then ';
+16904 +        end;
+16905 +        else
+16906 +           string = strip(name)!!' ne . ) then ';
+16907 +        put string;
+16909 +        select(REPLACE_VALUE);
+16910 +           when('_MODE_') do;
+16911 +              if type eq 'C' then
+16912 +                 replaceLevel = NORMMODE;
+16913 +              else
+16914 +                 replaceLevel =strip(put(MODEN,BEST.));
+16915 +           end;
+16916 +           when('_MISSING_') do;
+16917 +              if type eq 'C' then replaceLevel = '';
+16918 +              else replaceLevel = '.';
+16919 +           end;
+16920 +           when('_DEFAULT_') do;
+16921 +              %if &EM_PROPERTY_UNKNOWNLEVEL = MODE %then %do;
+16922 +                  if type eq 'C' then
+16923 +                     replaceLevel = NORMMODE;
+16924 +                  else
+16925 +                     replaceLevel = strip(put(MODEN,BEST.));
+16926 +              %end;
+16927 +              %else %do;
+16928 +                  if type eq 'C' then replaceLevel = '';
+16929 +                  else replaceLevel = '.';
+16930 +              %end;
+16931 +           end;
+16932 +           when('') do;
+16933 +           end;
+16934 +           otherwise do;
+16935 +               if type eq 'C' then replaceLevel= replace_Value;
+16936 +               else replaceLevel = replace_Value;
+16937 +           end;
+16938 +        end;
+16939 +        if type eq 'C' then do;
+16940 +           string = strip(newname)!!'= "'!!tranwrd(strip(replaceLevel),'"','""')!!'";';
+16941 +        end;
+16942 +        else do;
+16943 +           string = strip(newname)!!'= '!!strip(replaceLevel)!!';';
+16944 +        end;
+16945 +        put string;
+16946 +     end;
+16948 +     run;
+16949 +     filename _F1;
+16950 +    %doendm:
+16951 +%mend makeUnknownCode;
+16953 +%macro makeReplaceCode(ScoreFile=, Data=);
+16954 +   filename _F1 "&ScoreFile"  MOD;
+16955 +   data _null_;
+16956 +      length string $400;
+16957 +      set &data end=eof;
+16958 +      file _F1;
+16959 +      by NAME;
+16960 +      if _N_=1 then do;
+16961 +         put '   ';
+16962 +         put '* ;';
+16963 +         put '* Replace Specific Class Levels ;';
+16964 +         put '* ;';
+16965 +         put 'length _UFormat200 $200;';
+16966 +         put 'drop   _UFORMAT200;';
+16967 +         put '_UFORMAT200 = " ";';
+16968 +      end;
+16969 +      if first.name then do;
+16970 +         put '* ;';
+16971 +         string = '* Variable: '!!strip(NAME)!!';';
+16972 +         put string;
+16973 +         put '* ;';
+16974 +         if format ne '' then do;
+16975 +            call symput('UFormatFlag', '1');
+16976 +            string = "_UFORMAT200 = strip("; put string;
+16977 +            string ='put('!!strip(NAME)!!','!!strip(format)!!'));';
+16978 +            put string;
+16979 +         end;
+16980 +         else
+16981 +           if type eq 'C' then do;
+16982 +              call symput('UFormatFlag', '1');
+16983 +              string = "_UFORMAT200 = strip("!!strip(NAME)!!');';
+16984 +              put string;
+16985 +           end;
+16986 +      end;
+16987 +      if ^first.name then
+16988 +         put 'else';
+16989 +      if format ne '' then do;
+16990 +         string = tranwrd(strip(LEVEL),'"','""');
+16991 +         string =' if _UFORMAT200 =  "'!!strip(string)!!'" then ';
+16992 +         put string;
+16993 +      end;
+16994 +      else do;
+16995 +         if type eq 'N' then do;
+16996 +            string = 'if '!!strip(name)!!' = '!!strip(put(nraw, BEST.))!!' then ';
+16997 +            put string;
+16998 +         end;
+16999 +         else do;
+17000 +            string = tranwrd(strip(craw),'"','""');
+17001 +            string = ' if _UFORMAT200 =  "'!!strip(string)!!'" then ';
+17002 +            put string;
+17003 +         end;
+17004 +      end;
+17005 +      string = strip(newname)!!'=';
+17006 +      if type eq 'C' then do;
+17007 +         if upcase(replace_value) eq '_MISSING_' or
+17008 +            (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT)= 'MISSING')) then replace_Value ='';
+17009 +         else
+17010 +           if upcase(replace_value) eq '_MODE_' or
+17011 +            (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT)= 'MODE'))
+17012 +            then replace_Value =modec;
+17013 +           string = strip(string)!!'"'!!tranwrd(strip(replace_Value),'"','""')!!'";';
+17014 +      end;
+17015 +      else do;
+17016 +         if upcase(replace_value) eq '_MISSING_' or
+17017 +            (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT) = 'MISSING')) then replace_Value ='.';
+17018 +         else
+17019 +           if upcase(replace_value) eq '_MODE_' or
+17020 +            (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT) = 'MODE')) then
+17021 +                  replace_Value =strip(put(moden, BEST.));
+17023 +         string = strip(string)!!''!!strip(replace_value)!!';';
+17024 +      end;
+17025 +      put string;
+17026 +    run;
+17027 +    filename _F1;
+17029 +%mend makeReplaceCode;
+17031 +%macro makeReplaceOptCode(Folder=, Data=);
+17032 +    %if ^%sysfunc(exist(&Data)) %then %goto doendr;
+17034 +    %let dsid = %sysfunc(open(&data));
+17035 +    %let nameNum    = %sysfunc(varnum(&dsid, Name));
+17036 +    %let newnameNum = %sysfunc(varnum(&dsid, NewName));
+17038 +    %let oldname=;
+17039 +    %do %while(^%sysfunc(fetch(&dsid)));
+17040 +        %let name    = %sysfunc(getvarc(&dsid, &nameNum));
+17041 +        %let newName = %sysfunc(getvarc(&dsid, &newnameNum));
+17043 +        %if &name ne &oldname %then %do;
+17044 +            filename _F1 "&Folder&em_dsep.&newname..sas" MOD;
+17045 +            data _null_;
+17046 +               length string $400;
+17047 +               set &Data end=eof;
+17048 +               by NAME;
+17049 +               where NAME ="&name";
+17050 +               file _F1;
+17051 +               if _N_=1 then do;
+17052 +                  put '* ;';
+17053 +                  string = '* Variable: '!!strip(NAME)!!';';
+17054 +                  put string;
+17055 +                  put '* ;';
+17056 +                  if format ne '' then do;
+17057 +                     string = "_UFORMAT200 = strip("; put string;
+17058 +                     string ='put('!!strip(NAME)!!','!!strip(format)!!'));';
+17059 +                     put string;
+17060 +                  end;
+17061 +                  else
+17062 +                     if type eq 'C' then do;
+17063 +                        call symput('UFormatFlag', '1');
+17064 +                        string = "_UFORMAT200 = strip("!!strip(NAME)!!');';
+17065 +                        put string;
+17066 +                    end;
+17067 +               end;
+17068 +               if ^first.name then
+17069 +                  put 'else';
+17070 +               if format ne '' then do;
+17071 +                  string = tranwrd(strip(LEVEL),'"','""');
+17072 +                  string =' if _UFORMAT200 =  "'!!strip(string)!!'" then ';
+17073 +                  put string;
+17074 +               end;
+17075 +               else do;
+17076 +                  if type eq 'N' then do;
+17077 +                     string = 'if '!!strip(name)!!' = '!!strip(put(nraw, BEST.))!!' then ';
+17078 +                     put string;
+17079 +                  end;
+17080 +                  else do;
+17081 +                     string = tranwrd(strip(craw),'"','""');
+17082 +                     string = ' if _UFORMAT200 =  "'!!strip(string)!!'" then ';
+17083 +                     put string;
+17084 +                  end;
+17085 +               end;
+17086 +               string = strip(newname)!!'=';
+17087 +               if type eq 'C' then do;
+17088 +                  if upcase(replace_value) eq '_MISSING_' or
+17089 +                     (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT)= 'MISSING')) then replace_Value ='';
+17090 +                  else
+17091 +                     if upcase(replace_value) eq '_MODE_' or
+17092 +                       (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT)= 'MODE'))
+17093 +                       then replace_Value =modec;
+17094 +                          string = strip(string)!!'"'!!tranwrd(strip(replace_Value),'"','""')!!'";';
+17095 +               end;
+17096 +              else do;
+17097 +                 if upcase(replace_value) eq '_MISSING_' or
+17098 +                    (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT) = 'MISSING')) then replace_Value ='.';
+17099 +                 else
+17100 +                    if upcase(replace_value) eq '_MODE_' or
+17101 +                       (upcase(replace_value) eq '_DEFAULT_' and (upcase(UNKWOWNDEFAULT) = 'MODE')) then
+17102 +                        replace_Value =strip(put(moden, BEST.));
+17104 +                 string = strip(string)!!''!!strip(replace_value)!!';';
+17105 +              end;
+17106 +             put string;
+17107 +          run;
+17108 +          filename _F1;
+17110 +           %let oldname = &name;
+17111 +        %end;
+17112 +    %end;
+17113 +    %let dsid = %sysfunc(close(&dsid));
+17115 +    %doendr:
+17117 +%mend makeReplaceOptCode;
+17120 +%macro makeNewVarCode(ScoreFile=, Data=);
+17121 +   filename _F1 "&ScoreFile"  MOD;
+17122 +   data _null_;
+17123 +     length string $400;
+17124 +      set &data end=eof;
+17125 +      file _F1;
+17126 +      if _N_=1 then do;
+17127 +         put '   ';
+17128 +         put '* ;';
+17129 +         put '* Defining New Variables;';
+17130 +         put '* ;';
+17131 +      end;
+17132 +      if type eq 'C' then do;
+17133 +         string = 'Length '!!strip(newname)!!' $'!!strip(put(length,BEST12.))!!';';
+17134 +         put string;
+17135 +      end;
+17136 +      else do;
+17137 +         string = 'Length '!!strip(newname)!!' 8;';
+17138 +         put string;
+17139 +      end;
+17141 +      if strip(label) = '' then label = name;
+17142 +      string= 'Label '!!strip(newname)!!"='Replacement: "!!strip(tranwrd(label, "'","''"))!!"';";
+17143 +      put string;
+17145 +      if format ne '' then do;
+17146 +         string ='format '!!strip(newname)!!' '!!strip(format)!!';';
+17147 +         put string;
+17148 +      end;
+17149 +      string = strip(newname)!!'= '!!strip(NAME)!!';';
+17150 +      put string;
+17151 +   run;
+17152 +%mend makeNewVarCode;
+17154 +%macro makeNewVarOptCode(Folder=, Data=);
+17155 +    %if ^%sysfunc(exist(&data)) or "&Folder" eq "" %then %goto doendo;
+17156 +    data _temp_;set &data;run;
+17157 +    %let dsid = %sysfunc(open(_temp_));
+17158 +    %let nobs  = %sysfunc(attrn(&dsid, NLOBS));
+17159 +    %do %while(^%sysfunc(fetch(&dsid)));
+17160 +        %let newNum     = %sysfunc(varnum(&dsid, NewName));
+17161 +        %let newname = %sysfunc(getvarc(&dsid, &newNum));
+17163 +        filename _F1 "&Folder.&em_dsep.&newname..sas";
+17164 +        data _null_;
+17165 +           length string $400;
+17166 +           set &data;
+17167 +           where NEWNAME="&newname";
+17168 +           file _F1;
+17169 +           put '   ';
+17170 +           put '* ;';
+17171 +           put "* Defining: &newname;";
+17172 +           put '* ;';
+17173 +           if type eq 'C' then  do;
+17174 +              string = 'Length '!!strip(newname)!!'$'!!strip(put(length, best.))!!';';
+17175 +              put string;
+17176 +           end;
+17177 +           else do;
+17178 +              string = 'Length '!!strip(newname)!!' 8;';
+17179 +              put string;
+17180 +           end;
+17181 +           if strip(label) = '' then label = name;
+17182 +           string= 'Label '!!strip(newname)!!"='Replacement: "!!strip(tranwrd(label, "'","''"))!!"';";
+17183 +           put string;
+17184 +           if format ne '' then do;
+17185 +              string= 'format '!!strip(newname)!!' '!!strip(format)!!';';
+17186 +              put string;
+17187 +           end;
+17188 +           string = strip(newname)!!'='!!strip(name)!!';';
+17189 +           put string;
+17190 +        run;
+17191 +    %end;
+17192 +    %let dsid = %sysfunc(close(&dsid));
+17193 +   %doendo:
+17194 +%mend makeNewVarOptCode;
+17196 +%macro makeClassScoreCode(LevelData=, nameData=_newNames);
+17197 +   %let UFormatFlag = 0;
+17199 +   %em_register(key=REPLACECODE, type=FOLDER);
+17201 +   /* Generating New Variable Score Code */
+17202 +   %makeNewVarCode(ScoreFile=&EM_FILE_EMFLOWSCORECODE,  Data=&nameData);
+17204 +   data _tempNewVars;
+17205 +      set &nameData;
+17206 +      where ROLE ne 'TARGET';
+17207 +   run;
+17208 +   %makeNewVarCode(ScoreFile=&EM_FILE_EMPUBLISHSCORECODE, Data=_tempNewVars);
+17209 +   %makeNewVarOptCode(Folder=&em_user_replacecode, Data=_tempNewVars);
+17211 +   proc datasets lib=WORK nolist;
+17212 +      delete _tempNewVars;
+17213 +   run;
+17214 +   quit;
+17216 +   /* Generating Publish Score Code */
+17217 +   data _temp;
+17218 +      set &LevelData;
+17219 +      where ROLE ne 'TARGET' and LEVEL='_UNKNOWN_' and (REPLACE_VALUE ^in('', '_DEFAULT_') or
+17220 +                             (REPLACE_VALUE='_DEFAULT_' and UNKWOWNDEFAULT ne 'NONE'));
+17221 +      keep NAME;
+17222 +   run;
+17224 +   data _temp;
+17225 +      merge _temp(in=_a) &Leveldata &nameData;
+17226 +      by NAME;
+17227 +      if _a then output;
+17228 +   run;
+17230 +   %makeUnknownCode(ScoreFile=&EM_FILE_EMPUBLISHSCORECODE, Data=_temp);
+17231 +   %makeUnknownOptCode(Folder=&em_user_replacecode,        Data=_temp);
+17232 +   proc datasets lib=work nolist;
+17233 +      delete _temp;
+17234 +   run;
+17235 +   quit;
+17237 +   data _temp;
+17238 +      merge &LevelData(in=_a where=( ROLE ne 'TARGET' and LEVEL ne '_UNKNOWN_' and
+17239 +        (REPLACE_VALUE ^in('', '_DEFAULT_') or (REPLACE_VALUE='_DEFAULT_' and UNKWOWNDEFAULT ne 'NONE')) ))  &nameData;
+17240 +      by NAME;
+17241 +      if _a then output;
+17242 +   run;
+17244 +   %makeReplaceCode(ScoreFile=&EM_FILE_EMPUBLISHSCORECODE, Data=_temp);
+17245 +   %makeReplaceOptCode(Folder=&em_user_replacecode,        Data=_temp);
+17247 +   /* Generating Flow Score Code */
+17248 +   data _temp;
+17249 +      set &LevelData;
+17250 +      where LEVEL='_UNKNOWN_' and (REPLACE_VALUE ^in('', '_DEFAULT_') or
+17251 +                             (REPLACE_VALUE='_DEFAULT_' and UNKWOWNDEFAULT ne 'NONE'));
+17252 +      keep NAME;
+17253 +   run;
+17255 +   data _temp;
+17256 +      merge _temp(in=_a) &Leveldata &nameData;
+17257 +      by NAME;
+17258 +      if _a then output;
+17259 +   run;
+17260 +   %makeUnknownCode(ScoreFile=&EM_FILE_EMFLOWSCORECODE, Data=_temp);
+17262 +   data _temp;
+17263 +      merge &LevelData(in=_a where=(LEVEL ne '_UNKNOWN_' and (REPLACE_VALUE ^in('', '_DEFAULT_') or
+17264 +                             (REPLACE_VALUE='_DEFAULT_' and UNKWOWNDEFAULT ne 'NONE')) )) &nameData;
+17265 +      by NAME;
+17266 +      if _a then output;
+17267 +   run;
+17269 +   %makeReplaceCode(ScoreFile=&EM_FILE_EMFLOWSCORECODE, Data=_temp);
+17271 +   %if "&UFormatFlag" = "1" %then %do;
+17272 +       filename _F1 "&em_user_replacecode&em_dsep._ALL_.sas" MOD;
+17273 +       data _null_;
+17274 +          file _F1;
+17275 +          put 'length _UFormat200 $200;';
+17276 +          put 'drop   _UFORMAT200;';
+17277 +          put '_UFORMAT200 = " ";';
+17278 +       run;
+17279 +       filename _F1;
+17280 +   %end;
+17282 +%mend makeClassScoreCode;
+17284 +%macro makeClassDeltaCode(nameData=_newNames);
+17285 +   %if ^%sysfunc(exist(&nameData)) %then %goto doendm;
+17287 +   filename _F1 "&EM_FILE_CDELTA_TRAIN" MOD;
+17288 +   data _null_;
+17289 +        set &nameData end=eof;
+17290 +        length string $400;
+17291 +        file _F1;
+17292 +        %if &EM_PROPERTY_HIDEVARIABLE eq Y %then %do;
+17293 +            string = 'if NAME="'!!strip(NAME)!!'" then delete;';  put string;
+17294 +        %end;
+17295 +        %else %do;
+17296 +            string = 'if NAME="'!!strip(NAME)!!'" then ROLE="REJECTED";'; put string;
+17297 +        %end;
+17298 +        put 'else';
+17299 +        string = '   if NAME="'!!strip(NEWNAME)!!'" then do;'; put string;
+17300 +        string = '      ROLE="'!!strip(ROLE)!!'";';            put string;
+17301 +        string = '      LEVEL="'!!strip(MLEVEL)!!'";';         put string;
+17302 +        put      'end;';
+17303 +        if ^eof then
+17304 +           put 'else';
+17305 +   run;
+17306 +   %doendm:
+17307 +   filename _F1;
+17308 +%mend makeClassDeltaCode;
+17310 +%macro makeValueReport(Data=, outData=);
+17311 +   data &outData;
+17312 +      set &data;
+17313 +      where REPLACE_VALUE ^in('', '_DEFAULT_') or (REPLACE_VALUE eq '_DEFAULT_' and UNKWOWNDEFAULT ne 'NONE');
+17314 +      if LEVEL = '_UNKNOWN_' then do;
+17315 +         LEVEL='Unknown';
+17316 +         %if &EM_PROPERTY_UNKNOWNLEVEL = MODE %then %do;
+17317 +         if REPLACE_VALUE in('_MODE_', '_DEFAULT_') then REPLACE_VALUE = strip(NORMMODE);
+17318 +         else
+17319 +            if REPLACE_VALUE ='_MISSING_' then do;
+17320 +               if type eq 'N' then REPLACE_VALUE='.';
+17321 +               else REPLACE_VALUE='_blank_';
+17322 +            end;
+17323 +         %end;
+17324 +         %else  %do;
+17325 +         if REPLACE_VALUE = '_MODE_' then REPLACE_VALUE = strip(NORMMODE);
+17326 +         else
+17327 +            if REPLACE_VALUE in('_MISSING_', '_DEFAULT_') then do;
+17328 +               if type eq 'N' then REPLACE_VALUE='.';
+17329 +               else REPLACE_VALUE='_blank_';
+17330 +            end;
+17331 +         %end;
+17332 +      end;
+17333 +      else do;
+17334 +         if REPLACE_VALUE ='_MISSING_' then do;
+17335 +            if type eq 'N' then REPLACE_VALUE='.';
+17336 +            else REPLACE_VALUE='_blank_';
+17337 +         end;
+17338 +         else
+17339 +            if REPLACE_VALUE = '_MODE_' then REPLACE_VALUE = strip(NORMMODE);
+17340 +      end;
+17341 +      keep NAME LEVEL CRAW NRAW REPLACE_VALUE TYPE LABEL ;
+17342 +   run;
+17343 +%mend makeValueReport;
+17345 +%macro makeVarOptCode(LimitDs=, Folder=);
+17346 +    %if ^%sysfunc(exist(&LimitDs)) or "&Folder" eq "" %then %goto doendo;
+17348 +    %let dsid = %sysfunc(open(&limitDs));
+17349 +    %do %while(^%sysfunc(fetch(&dsid)));
+17350 +        %let newNum     = %sysfunc(varnum(&dsid, NewName));
+17351 +        %let newname = %sysfunc(getvarc(&dsid, &newNum));
+17353 +    filename sfile "&Folder.&em_dsep.&newname..sas";
+17354 +    data _null_;
+17355 +       length string $400;
+17356 +       set &LimitDs;
+17357 +       where NEWNAME="&newname";
+17358 +       file sfile;
+17359 +       put '* ;';
+17360 +       string = '*Variable: '!!strip(name)!!';';
+17361 +       put string;
+17362 +       put '* ;';
+17363 +       if label eq '' then
+17364 +          string = 'Label '!!strip(newname)!!"= 'Replacement: "!!strip(name)!!"';";
+17365 +       else
+17366 +          string = 'Label '!!strip(newname)!!"= 'Replacement: "!!strip(tranwrd(label, "'", "''"))!!"';";
+17367 +       put string;
+17368 +       string = 'length '!!strip(newname)!!' 8;';
+17369 +       put string;
+17370 +       string = strip(newname)!!'= '!!strip(NAME)!!';';
+17371 +       put string;
+17372 +       replacemin = .;
+17373 +       string = 'if '!!strip(name)!!' eq . then '!!strip(newname)!!' = .;';
+17374 +       put string;
+17375 +       if LowerLimit ne . then do;
+17376 +          if ReplaceMethodUsed="COMPUTED" then replaceMin=LowerLimit;
+17377 +          if ReplaceMethodUsed="MANUAL"   then replaceMin = ReplaceMinUsed;
+17378 +          put 'else';
+17379 +          string = 'if '!!strip(name)!!'<'!!strip(put(lowerlimit,best.))
+17380 +                    !!' then '!!strip(newname)!!'='!!strip(put(replaceMin,best.))!!';';
+17381 +          put string;
+17382 +       end;
+17383 +       if UpperLimit ne . then do;
+17384 +          if ReplaceMethodUsed="COMPUTED" then replaceMax=UpperLimit;
+17385 +          if ReplaceMethodUsed="MANUAL"   then replaceMax = ReplaceMaxUsed;
+17386 +          put 'else';
+17387 +          string = 'if '!!strip(name)!!'>'!!strip(put(upperlimit,best.))
+17388 +                    !!' then '!!strip(newname)!!'='!!strip(put(replaceMax,best.))!!';';
+17389 +          put string;
+17390 +       end;
+17391 +        run;
+17392 +        filename sfile;
+17393 +    %end;
+17394 +    %let dsid = %sysfunc(close(&dsid));
+17396 +    %doendo:
+17397 +%mend makeVarOptCode;
+17399 +%macro score;
+17400 +   %em_register(key=REPLACECODE, type=FOLDER);
+17402 +   filename x catalog 'sashelp.emutil.em_deldir.source';
+17403 +   %inc x;
+17404 +   filename x;
+17405 +   %delDir(folder=%nrbquote(&em_user_replacecode));
+17407 +   data _null_; length rc $200;
+17408 +      rc = dcreate('REPLACECODE', "&EM_NODEDIR");
+17409 +   run;
+17411 +   filename _F1 "&EM_FILE_EMFLOWSCORECODE";
+17412 +   filename _F2 "&EM_FILE_EMPUBLISHSCORECODE";
+17413 +   filename _F3 "&EM_FILE_CDELTA_TRAIN";
+17414 +   data _null_;
+17415 +      rc=fdelete('_F1');
+17416 +      rc=fdelete('_F2');
+17417 +      rc=fdelete('_F3');
+17418 +   run;
+17419 +   filename _F1;
+17420 +   filename _F2;
+17421 +   filename _F3;
+17423 +   %em_getname(key=OUTCLASS,  type=DATA);
+17424 +   %em_getname(key=LIMITS, type=DATA);
+17425 +   %em_getname(key=CLASSINFO, type=DATA);
+17427 +   /* Retrieve Replacement Values for Class Variables */
+17428 +   %makeLevelData(outclass=&em_user_outclass, data=CLASSTEMP);
+17430 +   /* Generate Names for Replaced Variables */
+17431 +   %makeNewNames(limitDs =&em_user_limits, classValue=CLASSTEMP, classname=&em_user_classinfo);
+17433 +   /* Generate score and delta code for Var Variables */
+17434 +   %if %sysfunc(exist(&EM_USER_LIMITS)) %then %do;
+17435 +       %makeVarScoreCode(LimitDs = &EM_USER_LIMITS, File=&EM_FILE_EMFLOWSCORECODE);
+17436 +       %makeVarScoreCode(LimitDs = &EM_USER_LIMITS, File=&EM_FILE_EMPUBLISHSCORECODE);
+17437 +       %makeVarOptCode(LimitDs= &EM_USER_LIMITS,    Folder=&em_user_replacecode);
+17438 +       %makeVarDeltaCode(LimitDs = &EM_USER_LIMITS);
+17440 +       proc print data=&EM_USER_LIMITS label noobs;
+17441 +          var Name newname lowerLimit REPLACEMINUSED UpperLimit REPLACEMAXUSED;
+17442 +          label REPLACEMINUSED  =  "%sysfunc(sasmsg(sashelp.dmine, rpt_replacemin_vlabel, NOQUOTE))"
+17443 +                REPLACEMAXUSED  =  "%sysfunc(sasmsg(sashelp.dmine, rpt_replacemax_vlabel, NOQUOTE))";
+17444 +          title9  ' ';
+17445 +          title10 "%sysfunc(sasmsg(sashelp.dmine, rpt_varlimits_title, NOQUOTE))";
+17446 +       run;
+17447 +       title10;
+17448 +  %end;
+17450 +   %if %sysfunc(exist(&EM_USER_CLASSINFO)) %then %do;
+17451 +       %makeClassScoreCode(LevelData=CLASSTEMP, nameData=&em_user_classinfo);
+17452 +       %makeClassDeltaCode(nameData=&em_user_classinfo);
+17453 +   %end;
+17455 +   %em_getname(key=VALUES, type=DATA);
+17456 +   %makeValueReport(data=CLASSTEMP, outData=&EM_USER_VALUES);
+17457 +   %if %sysfunc(exist(&EM_USER_VALUES)) %then %do;
+17458 +       %let nobs = 0;
+17459 +       %let dsid = %sysfunc(open(&EM_USER_VALUES));
+17460 +       %if &dsid %then %do;
+17461 +           %let nobs =  %sysfunc(attrn(&dsid, NOBS));
+17462 +           %let dsid = %sysfunc(close(&dsid));
+17463 +       %end;
+17464 +       %if &nobs %then
+17465 +           %EM_REPORT(key=VALUES, viewtype=DATA, block=MODEL, description=ReplaceLevels,autoDisplay=N);
+17466 +   %end;
+17468 +   %if %sysfunc(exist(&EM_USER_VALUES)) %then %do;
+17469 +       proc print data=&EM_USER_VALUES label noobs;
+17470 +          title9  ' ';
+17471 +          title10 "%sysfunc(sasmsg(sashelp.dmine, rpt_classreplacement_title, NOQUOTE))";
+17472 +      run;
+17473 +      title10;
+17474 +  %end;
+17476 +   proc datasets lib=work nolist;
+17477 +      delete CLASSTEMP;
+17478 +   run;
+17479 +   quit;
+17481 +   %em_register(key=EMSCOREVAR, type=DATA);
+17482 +   %let scorevarDs = %scan(&em_user_emscorevar, 2, .);
+17483 +   proc datasets lib=&em_lib nolist;
+17484 +      delete &scorevarDs;
+17485 +   run;
+17486 +   quit;
+17488 +   %let filrf=mydir;
+17489 +   %let rc=%sysfunc(filename(filrf,&em_user_replacecode));
+17490 +   %let did=%sysfunc(dopen(&filrf));
+17492 +   %if &did %then %do;
+17493 +       %let memcount=%sysfunc(dnum(&did));
+17494 +       %if &memcount > 0 %then %do;
+17495 +           data &em_user_emscorevar;
+17496 +              length Name $32 formula $70 file $200;
+17497 +              keep NAME Formula file;
+17499 +           %if %sysfunc(fileexist(&em_user_replacecode&em_dsep._ALL_.sas)) %then %do;
+17500 +               name=''; file="REPLACECODE&em_dsep._ALL_.sas";
+17501 +               output;
+17502 +           %end;
+17503 +           %do i=1 %to &memcount;
+17504 +               %let name =%nrbquote(%sysfunc(dread(&did,&i)));
+17505 +               %let newvar = %scan(&name, 1, .);
+17506 +               %if "&newvar" ne "_ALL_" %then %do;
+17507 +                   name = "&newvar"; file="REPLACECODE&em_dsep&name";
+17508 +                   output;
+17509 +               %end;
+17510 +           %end;
+17511 +           run;
+17512 +       %end;
+17513 +  %end;
+17514 +  %if &did %then %let did = %sysfunc(dclose(&did));
+17517 +%mend score;
+NOTE: %INCLUDE (level 1) ending.
+NOTE: Fileref TEMP has been deassigned.
+
+NOTE: The data set WORK.EM_USER_KEY has 1 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: %INCLUDE (level 1) file X is file SASHELP.EMUTIL.EM_DELDIR.SOURCE.
+17518 +%macro delDir(folder=);
+17519 +   %let filrf=mydir;
+17520 +   %let rc=%sysfunc(filename(filrf,&folder));
+17521 +   %let did=%sysfunc(dopen(&filrf));
+17522 +
+17523 +   %if &did %then %do;
+17524 +       %let memcount=%sysfunc(dnum(&did));
+17525 +       %if &memcount > 0 %then %do;
+17526 +           %do i=1 %to &memcount;
+17527 +               %let name =%nrbquote(%sysfunc(dread(&did,&i)));
+17528 +               data _null_;
+17529 +                  fname="_temp&i";
+17530 +                  rc=filename(fname,"&folder&em_dsep.&name");
+17531 +                  if rc = 0 and fexist(fname) then
+17532 +                     rc=fdelete(fname);
+17533 +                  rc=filename(fname);
+17534 +               run;
+17535 +           %end;
+17536 +       %end;
+17537 +       %let rc=%sysfunc(dclose(&did));
+17538 +   %end;
+17539 +   %let rc = %sysfunc(fdelete(&filrf));
+17540 +   %let rc=%sysfunc(filename(filrf));
+17541 +%mend delDir;
+NOTE: %INCLUDE (level 1) ending.
+NOTE: Fileref X has been deassigned.
+
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref _F1 has been deassigned.
+NOTE: Fileref _F2 has been deassigned.
+NOTE: Fileref _F3 has been deassigned.
+
+WARNING: The variable UNKWOWNDEFAULT in the DROP, KEEP, or RENAME list has never been referenced.
+NOTE: There were 75 observations read from the data set EMWS1.REPL_OUTCLASS.
+NOTE: The data set WORK.REPLACE_MODE has 6 observations and 4 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.02 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 27 observations read from the data set EMWS1.REPL_VARIABLESET.
+NOTE: The data set EMWS1.REPL_VARIABLESET has 27 observations and 27 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+WARNING: Multiple lengths were specified for the BY variable Name by input data sets. This might cause unexpected results.
+NOTE: There were 75 observations read from the data set EMWS1.REPL_OUTCLASS.
+NOTE: There were 6 observations read from the data set WORK.REPLACE_MODE.
+NOTE: There were 6 observations read from the data set EMWS1.REPL_VARIABLESET.
+      WHERE MLEVEL not = 'INTERVAL';
+NOTE: The data set WORK.CLASSTEMP has 75 observations and 16 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Deleting WORK.REPLACE_MODE (memtype=DATA).
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Input data set is empty.
+NOTE: 0 observations with duplicate key values were deleted.
+NOTE: There were 0 observations read from the data set WORK.CLASSTEMP.
+      WHERE REPLACE_VALUE not in (' ', '_DEFAULT_') or ((REPLACE_VALUE='_DEFAULT_') and (UNKWOWNDEFAULT not = 'NONE'));
+NOTE: The data set WORK.INVARNAME has 0 observations and 16 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1 observations read from the data set EMWS1.REPL_LIMITS.
+NOTE: The data set WORK.INVARNAME has 1 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1 observations read from the data set WORK.INVARNAME.
+NOTE: The data set WORK.OUTNAME has 1 observations and 2 variables.
+NOTE: PROCEDURE DMDB used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1 observations read from the data set WORK.OUTNAME.
+NOTE: The data set WORK.OUTNAME has 1 observations and 2 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1 observations read from the data set WORK.OUTNAME.
+NOTE: There were 1 observations read from the data set EMWS1.REPL_LIMITS.
+NOTE: The data set EMWS1.REPL_LIMITS has 1 observations and 11 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+WARNING: Variable REPLACEMETHODUSED not found in data set EMWS1.REPL_LIMITS.
+WARNING: Variable REPLACEMINUSED not found in data set EMWS1.REPL_LIMITS.
+WARNING: Variable REPLACEDMAXUSED not found in data set EMWS1.REPL_LIMITS.
+
+NOTE: MODIFY was successful for EMWS1.REPL_LIMITS.DATA.
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.05 seconds
+      cpu time            0.03 seconds
+      
+
+
+NOTE: There were 75 observations read from the data set WORK.CLASSTEMP.
+NOTE: The data set WORK.LENGTH has 6 observations and 8 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 1 observations read from the data set WORK.OUTNAME.
+NOTE: There were 6 observations read from the data set WORK.LENGTH.
+NOTE: The data set EMWS1.REPL_CLASSINFO has 0 observations and 8 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Deleting WORK.LENGTH (memtype=DATA).
+NOTE: Deleting WORK.INVARNAME (memtype=DATA).
+NOTE: Deleting WORK.OUTNAME (memtype=DATA).
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: The file SFILE is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMFLOWSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=0,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 9 records were written to the file SFILE.
+      The minimum record length was 3.
+      The maximum record length was 59.
+NOTE: There were 1 observations read from the data set EMWS1.REPL_LIMITS.
+NOTE: The data set EMWS1.REPL_LIMITS has 1 observations and 14 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.01 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Fileref SFILE has been deassigned.
+
+NOTE: The file SFILE is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMPUBLISHSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=0,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 9 records were written to the file SFILE.
+      The minimum record length was 3.
+      The maximum record length was 59.
+NOTE: There were 1 observations read from the data set EMWS1.REPL_LIMITS.
+NOTE: The data set EMWS1.REPL_LIMITS has 1 observations and 14 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref SFILE has been deassigned.
+
+NOTE: The file SFILE is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\REPLACECODE\REP_DemMedIncome.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=0,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 9 records were written to the file SFILE.
+      The minimum record length was 3.
+      The maximum record length was 60.
+NOTE: There were 1 observations read from the data set EMWS1.REPL_LIMITS.
+      WHERE NEWNAME='REP_DemMedIncome';
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref SFILE has been deassigned.
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\CDELTA_TRAIN.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=0,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 9 records were written to the file _F1.
+      The minimum record length was 4.
+      The maximum record length was 35.
+NOTE: There were 1 observations read from the data set EMWS1.REPL_LIMITS.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref _F1 has been deassigned.
+
+NOTE: There were 1 observations read from the data set EMWS1.REPL_LIMITS.
+NOTE: The PROCEDURE PRINT printed page 2.
+NOTE: PROCEDURE PRINT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 1 observations read from the data set WORK.EM_USER_KEY.
+NOTE: The data set WORK.EM_USER_KEY has 2 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMFLOWSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=268,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 0 records were written to the file _F1.
+NOTE: There were 0 observations read from the data set EMWS1.REPL_CLASSINFO.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 0 observations read from the data set EMWS1.REPL_CLASSINFO.
+      WHERE ROLE not = 'TARGET';
+NOTE: The data set WORK._TEMPNEWVARS has 0 observations and 8 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMPUBLISHSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=268,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 0 records were written to the file _F1.
+NOTE: There were 0 observations read from the data set WORK._TEMPNEWVARS.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: There were 0 observations read from the data set WORK._TEMPNEWVARS.
+NOTE: The data set WORK._TEMP_ has 0 observations and 8 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Deleting WORK._TEMPNEWVARS (memtype=DATA).
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 0 observations read from the data set WORK.CLASSTEMP.
+      WHERE (ROLE not = 'TARGET') and (LEVEL='_UNKNOWN_') and (REPLACE_VALUE not in (' ', '_DEFAULT_') or ((REPLACE_VALUE='_DEFAULT_') and (UNKWOWNDEFAULT not = 'NONE')));
+NOTE: The data set WORK._TEMP has 0 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+WARNING: Multiple lengths were specified for the BY variable Name by input data sets. This might cause unexpected results.
+NOTE: There were 0 observations read from the data set WORK._TEMP.
+NOTE: There were 75 observations read from the data set WORK.CLASSTEMP.
+NOTE: There were 0 observations read from the data set EMWS1.REPL_CLASSINFO.
+NOTE: The data set WORK._TEMP has 0 observations and 17 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMPUBLISHSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=268,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 0 records were written to the file _F1.
+NOTE: There were 0 observations read from the data set WORK._TEMP.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+NOTE: Fileref _F1 has been deassigned.
+
+NOTE: Deleting WORK._TEMP (memtype=DATA).
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+WARNING: Multiple lengths were specified for the BY variable Name by input data sets. This might cause unexpected results.
+NOTE: There were 0 observations read from the data set WORK.CLASSTEMP.
+      WHERE (ROLE not = 'TARGET') and (LEVEL not = '_UNKNOWN_') and (REPLACE_VALUE not in (' ', '_DEFAULT_') or ((REPLACE_VALUE='_DEFAULT_') and (UNKWOWNDEFAULT not = 'NONE')));
+NOTE: There were 0 observations read from the data set EMWS1.REPL_CLASSINFO.
+NOTE: The data set WORK._TEMP has 0 observations and 17 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMPUBLISHSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=268,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 0 records were written to the file _F1.
+NOTE: There were 0 observations read from the data set WORK._TEMP.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref _F1 has been deassigned.
+
+NOTE: There were 0 observations read from the data set WORK.CLASSTEMP.
+      WHERE (LEVEL='_UNKNOWN_') and (REPLACE_VALUE not in (' ', '_DEFAULT_') or ((REPLACE_VALUE='_DEFAULT_') and (UNKWOWNDEFAULT not = 'NONE')));
+NOTE: The data set WORK._TEMP has 0 observations and 1 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+WARNING: Multiple lengths were specified for the BY variable Name by input data sets. This might cause unexpected results.
+NOTE: There were 0 observations read from the data set WORK._TEMP.
+NOTE: There were 75 observations read from the data set WORK.CLASSTEMP.
+NOTE: There were 0 observations read from the data set EMWS1.REPL_CLASSINFO.
+NOTE: The data set WORK._TEMP has 0 observations and 17 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMFLOWSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=268,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 0 records were written to the file _F1.
+NOTE: There were 0 observations read from the data set WORK._TEMP.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref _F1 has been deassigned.
+
+WARNING: Multiple lengths were specified for the BY variable Name by input data sets. This might cause unexpected results.
+NOTE: There were 0 observations read from the data set WORK.CLASSTEMP.
+      WHERE (LEVEL not = '_UNKNOWN_') and (REPLACE_VALUE not in (' ', '_DEFAULT_') or ((REPLACE_VALUE='_DEFAULT_') and (UNKWOWNDEFAULT not = 'NONE')));
+NOTE: There were 0 observations read from the data set EMWS1.REPL_CLASSINFO.
+NOTE: The data set WORK._TEMP has 0 observations and 17 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMFLOWSCORE.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=268,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 0 records were written to the file _F1.
+NOTE: There were 0 observations read from the data set WORK._TEMP.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref _F1 has been deassigned.
+
+NOTE: The file _F1 is:
+      Filename=D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\CDELTA_TRAIN.sas,
+      RECFM=V,LRECL=32767,File Size (bytes)=170,
+      Last Modified=29Sep2017:19:41:29,
+      Create Time=29Sep2017:19:41:29
+
+NOTE: 0 records were written to the file _F1.
+NOTE: There were 0 observations read from the data set EMWS1.REPL_CLASSINFO.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+NOTE: Fileref _F1 has been deassigned.
+
+NOTE: There were 0 observations read from the data set WORK.CLASSTEMP.
+      WHERE REPLACE_VALUE not in (' ', '_DEFAULT_') or ((REPLACE_VALUE='_DEFAULT_') and (UNKWOWNDEFAULT not = 'NONE'));
+NOTE: The data set EMWS1.REPL_VALUES has 0 observations and 7 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: No observations in data set EMWS1.REPL_VALUES.
+NOTE: PROCEDURE PRINT used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Deleting WORK.CLASSTEMP (memtype=DATA).
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.01 seconds
+      
+
+
+NOTE: There were 2 observations read from the data set WORK.EM_USER_KEY.
+NOTE: The data set WORK.EM_USER_KEY has 3 observations and 9 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: The file EMWS1.REPL_EMSCOREVAR (memtype=DATA) was not found, but appears on a DELETE statement.
+
+NOTE: PROCEDURE DATASETS used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+
+NOTE: Variable formula is uninitialized.
+NOTE: The data set EMWS1.REPL_EMSCOREVAR has 1 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+17542  *------------------------------------------------------------*;
+17543  * End SCORE: Repl;
+17544  *------------------------------------------------------------*;
+17545  
+
+17546  filename emflow "D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMFLOWSCORE.sas";
+17547  *------------------------------------------------------------*;
+17548  * Repl: Scoring DATA data;
+17549  *------------------------------------------------------------*;
+17550  data EMWS1.Repl_TRAIN
+17551  / view=EMWS1.Repl_TRAIN
+17552  ;
+17553  set EMWS1.Ids_DATA
+17554  ;
+17555  %inc emflow;
+NOTE: %INCLUDE (level 1) file EMFLOW is file D:\5982361226\SAS\SASProject\Workspaces\EMWS1\Repl\EMFLOWSCORE.sas.
+17556 +* ;
+17557 +* Variable: DemMedIncome ;
+17558 +* ;
+17559 +Label REP_DemMedIncome='Replacement: Median Income Region';
+17560 +Length REP_DemMedIncome 8;
+17561 +REP_DemMedIncome =DemMedIncome ;
+17562 +if DemMedIncome  eq . then REP_DemMedIncome = . ;
+17563 +else
+17564 +if DemMedIncome <1  then REP_DemMedIncome  = . ;
+NOTE: %INCLUDE (level 1) ending.
+17565  run;
+
+NOTE: DATA STEP view saved on file EMWS1.REPL_TRAIN.
+NOTE: A stored DATA STEP view cannot run under a different operating system.
+NOTE: View EMWS1.IDS_DATA.VIEW used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.03 seconds
+      
+NOTE: DATA statement used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.03 seconds
+      
+
+17566  quit;
+17567  filename emflow;
+NOTE: Fileref EMFLOW has been deassigned.
+
+17569  *------------------------------------------------------------*;
+17570  * Repl: Computing metadata for TRAIN data;
+17571  *------------------------------------------------------------*;
+
+NOTE: View EMWS1.REPL_TRAIN.VIEW used (Total process time):
+      real time           0.06 seconds
+      cpu time            0.06 seconds
+      
+NOTE: View EMWS1.REPL_TRAIN.VIEW used (Total process time):
+      real time           0.04 seconds
+      cpu time            0.04 seconds
+      

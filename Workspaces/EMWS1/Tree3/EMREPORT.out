@@ -1,0 +1,181 @@
+ 
+                                                                                                                                                                                                                                                                
+ 
+Variable Importance
+
+                                                                                                         Ratio of
+                                               Number of                                               Validation
+                                               Splitting                            Validation        to Training
+Variable Name      Label                         Rules           Importance         Importance         Importance
+
+GiftCnt36          Gift Count 36 Months            1                 1.0000             1.0000             1.0000
+GiftAvgLast        Gift Amount Last                1                 0.5241             0.6719             1.2819
+DemMedHomeValue    Median Home Value Region        1                 0.5028             0.1086             0.2160
+GiftTimeLast       Time Since Last Gift            1                 0.4809             0.4453             0.9259
+ 
+                                                                                                                                                                                                                                                                
+ 
+Tree Leaf Report
+
+                                 Training
+Node               Training       Percent     Validation     Validation
+ Id     Depth    Observations        1       Observations     Percent 1
+
+  5       2          1437          0.47          1310           0.45   
+ 15       3          1011          0.49          1057           0.48   
+ 14       3           892          0.59           914           0.57   
+  4       2           846          0.37           897           0.40   
+  6       2           657          0.64           665           0.66   
+ 
+                                                                                               
+ 
+ 
+Fit Statistics
+
+Target=TARGET_B Target Label=Target Gift Flag
+
+   Fit
+Statistics    Statistics Label                Train    Validation
+
+  _NOBS_      Sum of Frequencies            4843.00      4843.00 
+  _MISC_      Misclassification Rate           0.43         0.43 
+  _MAX_       Maximum Absolute Error           0.64         0.64 
+  _SSE_       Sum of Squared Errors         2346.63      2356.28 
+  _ASE_       Average Squared Error            0.24         0.24 
+  _RASE_      Root Average Squared Error       0.49         0.49 
+  _DIV_       Divisor for ASE               9686.00      9686.00 
+  _DFT_       Total Degrees of Freedom      4843.00          .   
+ 
+                                                                                               
+ 
+ 
+Classification Table
+
+Data Role=TRAIN Target Variable=TARGET_B Target Label=Target Gift Flag
+
+                       Target        Outcome     Frequency       Total
+Target    Outcome    Percentage    Percentage      Count      Percentage
+
+  0          0         55.2823       75.1858        1821        37.6007 
+  1          0         44.7177       60.8426        1473        30.4150 
+  0          1         38.7992       24.8142         601        12.4097 
+  1          1         61.2008       39.1574         948        19.5746 
+
+
+Data Role=VALIDATE Target Variable=TARGET_B Target Label=Target Gift Flag
+
+                       Target        Outcome     Frequency       Total
+Target    Outcome    Percentage    Percentage      Count      Percentage
+
+  0          0         55.2696       74.5147        1804        37.2496 
+  1          0         44.7304       60.2808        1460        30.1466 
+  0          1         39.0754       25.4853         617        12.7400 
+  1          1         60.9246       39.7192         962        19.8637 
+ 
+                                                                                               
+ 
+ 
+Event Classification Table
+
+Data Role=TRAIN Target=TARGET_B Target Label=Target Gift Flag
+
+  False       True        False       True
+Negative    Negative    Positive    Positive
+
+  1473        1821         601         948  
+
+
+Data Role=VALIDATE Target=TARGET_B Target Label=Target Gift Flag
+
+  False       True        False       True
+Negative    Negative    Positive    Positive
+
+  1460        1804         617         962  
+ 
+                                                                                               
+ 
+ 
+Assessment Score Rankings
+
+Data Role=TRAIN Target Variable=TARGET_B Target Label=Target Gift Flag
+
+                                                                                    Mean
+                            Cumulative       %      Cumulative     Number of     Posterior
+Depth     Gain      Lift       Lift      Response   % Response   Observations   Probability
+
+   5    28.7937   1.28794     1.28794     64.3836     64.3836         243         0.64384  
+  10    28.7937   1.28794     1.28794     64.3836     64.3836         242         0.64384  
+  15    27.7291   1.25596     1.27729     62.7848     63.8514         242         0.62785  
+  20    25.2338   1.17737     1.25234     58.8565     62.6040         242         0.58857  
+  25    23.7357   1.17737     1.23736     58.8565     61.8551         242         0.58857  
+  30    22.7367   1.17737     1.22737     58.8565     61.3557         242         0.58857  
+  35    20.2533   1.05404     1.20253     52.6911     60.1142         243         0.52691  
+  40    17.3932   0.97349     1.17393     48.6647     58.6845         242         0.48665  
+  45    15.1682   0.97349     1.15168     48.6647     57.5722         242         0.48665  
+  50    13.3878   0.97349     1.13388     48.6647     56.6822         242         0.48665  
+  55    11.7770   0.95656     1.11777     47.8180     55.8770         242         0.47818  
+  60    10.2473   0.93408     1.10247     46.6945     55.1123         242         0.46695  
+  65     8.9528   0.93408     1.08953     46.6945     54.4652         242         0.46695  
+  70     7.8389   0.93408     1.07839     46.6945     53.9083         243         0.46695  
+  75     6.8777   0.93408     1.06878     46.6945     53.4278         242         0.46695  
+  80     6.0365   0.93408     1.06036     46.6945     53.0073         242         0.46695  
+  85     4.7081   0.83438     1.04708     41.7103     52.3433         242         0.41710  
+  90     2.9645   0.73301     1.02964     36.6430     51.4716         242         0.36643  
+  95     1.4043   0.73301     1.01404     36.6430     50.6917         242         0.36643  
+ 100     0.0000   0.73301     1.00000     36.6430     49.9897         242         0.36643  
+
+
+Data Role=VALIDATE Target Variable=TARGET_B Target Label=Target Gift Flag
+
+                                                                                    Mean
+                            Cumulative       %      Cumulative     Number of     Posterior
+Depth     Gain      Lift       Lift      Response   % Response   Observations   Probability
+
+   5    32.0028   1.32003     1.32003     66.0150     66.0150         243         0.64384  
+  10    32.0028   1.32003     1.32003     66.0150     66.0150         242         0.64384  
+  15    30.5032   1.27498     1.30503     63.7620     65.2651         242         0.62968  
+  20    26.4861   1.14418     1.26486     57.2210     63.2561         242         0.58857  
+  25    24.0746   1.14418     1.24075     57.2210     62.0501         242         0.58857  
+  30    22.4663   1.14418     1.22466     57.2210     61.2458         242         0.58857  
+  35    20.0757   1.05781     1.20076     52.9015     60.0502         243         0.53949  
+  40    17.1292   0.96480     1.17129     48.2498     58.5767         242         0.48665  
+  45    14.8369   0.96480     1.14837     48.2498     57.4303         242         0.48665  
+  50    13.0027   0.96480     1.13003     48.2498     56.5130         242         0.48665  
+  55    11.4375   0.95772     1.11437     47.8958     55.7302         242         0.48437  
+  60     9.6825   0.90363     1.09682     45.1908     54.8526         242         0.46695  
+  65     8.1973   0.90363     1.08197     45.1908     54.1098         242         0.46695  
+  70     6.9193   0.90363     1.06919     45.1908     53.4707         243         0.46695  
+  75     5.8164   0.90363     1.05816     45.1908     52.9191         242         0.46695  
+  80     4.8514   0.90363     1.04851     45.1908     52.4365         242         0.46695  
+  85     3.5612   0.82903     1.03561     41.4599     51.7913         242         0.39592  
+  90     2.2423   0.79805     1.02242     39.9108     51.1317         242         0.36643  
+  95     1.0622   0.79805     1.01062     39.9108     50.5415         242         0.36643  
+ 100     0.0000   0.79805     1.00000     39.9108     50.0103         242         0.36643  
+ 
+                                                                                               
+ 
+ 
+Assessment Score Distribution
+
+Data Role=TRAIN Target Variable=TARGET_B Target Label=Target Gift Flag
+
+ Posterior     Number                     Mean
+Probability      of      Number of     Posterior
+   Range       Events    Nonevents    Probability    Percentage
+
+ 0.60-0.65       423         234        0.64384        13.5660 
+ 0.55-0.60       525         367        0.58857        18.4183 
+ 0.45-0.50      1163        1285        0.47508        50.5472 
+ 0.35-0.40       310         536        0.36643        17.4685 
+
+
+Data Role=VALIDATE Target Variable=TARGET_B Target Label=Target Gift Flag
+
+ Posterior     Number                     Mean
+Probability      of      Number of     Posterior
+   Range       Events    Nonevents    Probability    Percentage
+
+ 0.60-0.65       439         226        0.64384        13.7312 
+ 0.55-0.60       523         391        0.58857        18.8726 
+ 0.45-0.50      1102        1265        0.47574        48.8747 
+ 0.35-0.40       358         539        0.36643        18.5216 

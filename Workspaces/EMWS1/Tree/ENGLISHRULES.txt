@@ -1,0 +1,197 @@
+*------------------------------------------------------------*
+ Node = 31
+*------------------------------------------------------------*
+if Promotion Count 12 Months >= 17.5
+AND Median Home Value Region < 70000
+AND Gift Count 36 Months < 2.5
+then 
+ Tree Node Identifier   = 31
+ Number of Observations = 37
+ Predicted: TARGET_B=1 = 0.68
+ Predicted: TARGET_B=0 = 0.32
+ 
+*------------------------------------------------------------*
+ Node = 33
+*------------------------------------------------------------*
+if Promotion Count 12 Months < 17.5 or MISSING
+AND Median Home Value Region < 70000
+AND Gift Count 36 Months < 2.5
+AND Gift Amount Average Card 36 Months >= 11.5 or MISSING
+then 
+ Tree Node Identifier   = 33
+ Number of Observations = 761
+ Predicted: TARGET_B=1 = 0.34
+ Predicted: TARGET_B=0 = 0.66
+ 
+*------------------------------------------------------------*
+ Node = 34
+*------------------------------------------------------------*
+if Promotion Count 12 Months < 17.5 or MISSING
+AND Median Home Value Region < 70000
+AND Home Owner IS ONE OF: H or MISSING
+AND Gift Count 36 Months < 2.5
+AND Gift Amount Average Card 36 Months < 11.5
+then 
+ Tree Node Identifier   = 34
+ Number of Observations = 66
+ Predicted: TARGET_B=1 = 0.62
+ Predicted: TARGET_B=0 = 0.38
+ 
+*------------------------------------------------------------*
+ Node = 35
+*------------------------------------------------------------*
+if Promotion Count 12 Months < 17.5 or MISSING
+AND Median Home Value Region < 70000
+AND Home Owner IS ONE OF: U
+AND Gift Count 36 Months < 2.5
+AND Gift Amount Average Card 36 Months < 11.5
+then 
+ Tree Node Identifier   = 35
+ Number of Observations = 58
+ Predicted: TARGET_B=1 = 0.40
+ Predicted: TARGET_B=0 = 0.60
+ 
+*------------------------------------------------------------*
+ Node = 36
+*------------------------------------------------------------*
+if Median Home Value Region >= 70000 or MISSING
+AND Gift Count 36 Months < 2.5
+AND Gift Amount Average All Months < 5.32
+then 
+ Tree Node Identifier   = 36
+ Number of Observations = 14
+ Predicted: TARGET_B=1 = 0.93
+ Predicted: TARGET_B=0 = 0.07
+ 
+*------------------------------------------------------------*
+ Node = 37
+*------------------------------------------------------------*
+if Median Home Value Region >= 70000 or MISSING
+AND Gift Count 36 Months < 2.5
+AND Gift Amount Average All Months >= 5.32 or MISSING
+then 
+ Tree Node Identifier   = 37
+ Number of Observations = 1347
+ Predicted: TARGET_B=1 = 0.46
+ Predicted: TARGET_B=0 = 0.54
+ 
+*------------------------------------------------------------*
+ Node = 39
+*------------------------------------------------------------*
+if Promotion Count 12 Months >= 10.5 or MISSING
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last < 7.5
+then 
+ Tree Node Identifier   = 39
+ Number of Observations = 542
+ Predicted: TARGET_B=1 = 0.61
+ Predicted: TARGET_B=0 = 0.39
+ 
+*------------------------------------------------------------*
+ Node = 40
+*------------------------------------------------------------*
+if Promotion Count 12 Months < 10.5
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last < 7.5
+AND Demographic Cluster IS ONE OF: 24, 49
+then 
+ Tree Node Identifier   = 40
+ Number of Observations = 14
+ Predicted: TARGET_B=1 = 0.43
+ Predicted: TARGET_B=0 = 0.57
+ 
+*------------------------------------------------------------*
+ Node = 41
+*------------------------------------------------------------*
+if Promotion Count 12 Months < 10.5
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last < 7.5
+AND Demographic Cluster IS ONE OF: 18, 53, 41 or MISSING
+then 
+ Tree Node Identifier   = 41
+ Number of Observations = 101
+ Predicted: TARGET_B=1 = 0.84
+ Predicted: TARGET_B=0 = 0.16
+ 
+*------------------------------------------------------------*
+ Node = 45
+*------------------------------------------------------------*
+if Time Since Last Gift < 17.5
+AND Median Home Value Region >= 124100
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+then 
+ Tree Node Identifier   = 45
+ Number of Observations = 206
+ Predicted: TARGET_B=1 = 0.69
+ Predicted: TARGET_B=0 = 0.31
+ 
+*------------------------------------------------------------*
+ Node = 46
+*------------------------------------------------------------*
+if Time Since Last Gift >= 17.5 or MISSING
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+AND Gift Amount Average Card 36 Months < 14.415
+then 
+ Tree Node Identifier   = 46
+ Number of Observations = 641
+ Predicted: TARGET_B=1 = 0.53
+ Predicted: TARGET_B=0 = 0.47
+ 
+*------------------------------------------------------------*
+ Node = 48
+*------------------------------------------------------------*
+if Time Since Last Gift < 17.5
+AND Status Category Star All Months IS ONE OF: 0
+AND Median Home Value Region < 124100 or MISSING
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+then 
+ Tree Node Identifier   = 48
+ Number of Observations = 194
+ Predicted: TARGET_B=1 = 0.47
+ Predicted: TARGET_B=0 = 0.53
+ 
+*------------------------------------------------------------*
+ Node = 49
+*------------------------------------------------------------*
+if Time Since Last Gift < 17.5
+AND Status Category Star All Months IS ONE OF: 1 or MISSING
+AND Median Home Value Region < 124100 or MISSING
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+then 
+ Tree Node Identifier   = 49
+ Number of Observations = 492
+ Predicted: TARGET_B=1 = 0.59
+ Predicted: TARGET_B=0 = 0.41
+ 
+*------------------------------------------------------------*
+ Node = 50
+*------------------------------------------------------------*
+if Time Since Last Gift >= 17.5 or MISSING
+AND Median Home Value Region < 79500 or MISSING
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+AND Gift Amount Average Card 36 Months >= 14.415 or MISSING
+then 
+ Tree Node Identifier   = 50
+ Number of Observations = 186
+ Predicted: TARGET_B=1 = 0.31
+ Predicted: TARGET_B=0 = 0.69
+ 
+*------------------------------------------------------------*
+ Node = 51
+*------------------------------------------------------------*
+if Time Since Last Gift >= 17.5 or MISSING
+AND Median Home Value Region >= 79500
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+AND Gift Amount Average Card 36 Months >= 14.415 or MISSING
+then 
+ Tree Node Identifier   = 51
+ Number of Observations = 184
+ Predicted: TARGET_B=1 = 0.52
+ Predicted: TARGET_B=0 = 0.48
+ 

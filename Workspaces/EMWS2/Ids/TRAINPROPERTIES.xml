@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?><_ROOT_  DataSource="census" Scope="LOCAL" Role="RAW" Library="DATA" Table="CENSUS2000" NCols="7"
+ NObs="33178" NBytes="." Segment="" DataSourceRole="RAW" OutputType="VIEW" ForceRun="N"
+ ComputeStatistics="N" DataSelection="DATASOURCE" NewTable="" MetaAdvisor="BASIC"
+ ApplyIntervalLevelLowerLimit="Y" IntervalLowerLimit="20" ApplyMaxPercentMissing="Y"
+ MaxPercentMissing="50" ApplyMaxClassLevels="Y" MaxClassLevels="20" IdentifyEmptyColumns="Y"
+ VariableValidation="STRICT" NewVariableRole="REJECT" DropMapVariables="Y" DsId="census"
+ DsSampleName="" DsSampleSizeType="" DsSampleSize="" DsCreatedBy="5981510226" DsCreateDate="1826904507.2"
+ DsModifiedBy="5981510226" DsModifyDate="1826904507.3" DsScope="LOCAL" Sample="D"
+ SampleSizeType="PERCENT" SampleSizePercent="20" SampleSizeObs="10000" DBPassThrough="Y"
+ RunAction="Train" Component="DataSource" RawCreateTime="1826905057.3" CreateTime="21NOV2017:17:37:37"
+ Description="" Data="DATA.CENSUS2000" CMeta="WORK.M0P_GPQZ" RunId="62a7899e-15a3-459f-a783-0c460c963835"
+ RawLastTimeRun="1826905295.9" RawRunTime="12.288000107" LastTimeRun="21NOV2017:17:41:36"
+ RunTime="0 Hr. 0 Min. 12.29 Sec.">
+<VARIABLEPROPERTIES/>
+<FILEPROPERTIES/>
+</_ROOT_>

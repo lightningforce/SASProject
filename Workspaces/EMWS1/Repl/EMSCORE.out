@@ -1,0 +1,11 @@
+ 
+                                                                                                                                                                                                                                                                
+ 
+ 
+Limits and Replacement Values for Interval Variables
+
+                                                Lower                   Upper
+                                    Lower    Replacement    Upper    Replacement
+  Variable      Replace Variable    limit       Value       Limit       Value
+
+DemMedIncome    REP_DemMedIncome      1           .           .           .     

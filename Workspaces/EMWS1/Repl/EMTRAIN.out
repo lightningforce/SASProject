@@ -1,0 +1,14 @@
+ 
+                                                                                                                                                                                                                                                                
+ 
+ 
+Variable Summary
+
+            Measurement    Frequency
+Role           Level         Count
+
+INPUT        BINARY             2   
+INPUT        INTERVAL          20   
+INPUT        NOMINAL            3   
+REJECTED     INTERVAL           1   
+TARGET       BINARY             1   

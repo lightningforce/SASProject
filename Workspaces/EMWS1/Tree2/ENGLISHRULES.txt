@@ -1,0 +1,59 @@
+*------------------------------------------------------------*
+ Node = 2
+*------------------------------------------------------------*
+if Gift Count 36 Months < 2.5
+then 
+ Tree Node Identifier   = 2
+ Number of Observations = 2283
+ Predicted: TARGET_B=1 = 0.43
+ Predicted: TARGET_B=0 = 0.57
+ 
+*------------------------------------------------------------*
+ Node = 6
+*------------------------------------------------------------*
+if Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last < 7.5
+then 
+ Tree Node Identifier   = 6
+ Number of Observations = 657
+ Predicted: TARGET_B=1 = 0.64
+ Predicted: TARGET_B=0 = 0.36
+ 
+*------------------------------------------------------------*
+ Node = 14
+*------------------------------------------------------------*
+if Time Since Last Gift < 17.5
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+then 
+ Tree Node Identifier   = 14
+ Number of Observations = 892
+ Predicted: TARGET_B=1 = 0.59
+ Predicted: TARGET_B=0 = 0.41
+ 
+*------------------------------------------------------------*
+ Node = 22
+*------------------------------------------------------------*
+if Time Since Last Gift >= 17.5 or MISSING
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+AND Gift Amount Average Card 36 Months < 14.415
+then 
+ Tree Node Identifier   = 22
+ Number of Observations = 641
+ Predicted: TARGET_B=1 = 0.53
+ Predicted: TARGET_B=0 = 0.47
+ 
+*------------------------------------------------------------*
+ Node = 23
+*------------------------------------------------------------*
+if Time Since Last Gift >= 17.5 or MISSING
+AND Gift Count 36 Months >= 2.5 or MISSING
+AND Gift Amount Last >= 7.5 or MISSING
+AND Gift Amount Average Card 36 Months >= 14.415 or MISSING
+then 
+ Tree Node Identifier   = 23
+ Number of Observations = 370
+ Predicted: TARGET_B=1 = 0.41
+ Predicted: TARGET_B=0 = 0.59
+ 

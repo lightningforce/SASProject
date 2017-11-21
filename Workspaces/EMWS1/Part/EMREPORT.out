@@ -1,0 +1,31 @@
+ 
+                                                                                                                                                                                                                                                                
+ 
+ 
+Summary Statistics for Class Targets
+
+Data=DATA
+
+            Numeric    Formatted    Frequency
+Variable     Value       Value        Count      Percent         Label
+
+TARGET_B       0           0           4843         50      Target Gift Flag
+TARGET_B       1           1           4843         50      Target Gift Flag
+
+
+Data=TRAIN
+
+            Numeric    Formatted    Frequency
+Variable     Value       Value        Count      Percent         Label
+
+TARGET_B       0           0           2422      50.0103    Target Gift Flag
+TARGET_B       1           1           2421      49.9897    Target Gift Flag
+
+
+Data=VALIDATE
+
+            Numeric    Formatted    Frequency
+Variable     Value       Value        Count      Percent         Label
+
+TARGET_B       0           0           2421      49.9897    Target Gift Flag
+TARGET_B       1           1           2422      50.0103    Target Gift Flag

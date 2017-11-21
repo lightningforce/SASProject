@@ -1,0 +1,51 @@
+*------------------------------------------------------------*
+User:                5982361226
+Date:                September 29, 2017
+Time:                19:41:31
+*------------------------------------------------------------*
+* Training Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Variable Summary
+ 
+            Measurement    Frequency
+Role           Level         Count
+ 
+INPUT        BINARY             2
+INPUT        INTERVAL          20
+INPUT        NOMINAL            3
+REJECTED     INTERVAL           1
+TARGET       BINARY             1
+
+
+*------------------------------------------------------------*
+* Score Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Limits and Replacement Values for Interval Variables
+ 
+                                                Lower                   Upper
+                                    Lower    Replacement    Upper    Replacement
+  Variable      Replace Variable    limit       Value       Limit       Value
+ 
+DemMedIncome    REP_DemMedIncome      1           .           .           .
+
+
+*------------------------------------------------------------*
+* Report Output
+*------------------------------------------------------------*
+ 
+ 
+ 
+ 
+Replacement Counts
+ 
+Obs      Variable             Label            Role     Train
+ 
+ 1     DemMedIncome    Median Income Region    INPUT     2357
