@@ -8,7 +8,8 @@
  DsModifiedBy="5981510226" DsModifyDate="1826909368.6" DsScope="LOCAL" Sample="D"
  SampleSizeType="PERCENT" SampleSizePercent="20" SampleSizeObs="10000" DBPassThrough="Y"
  RunAction="Train" Component="DataSource" RawCreateTime="1826909424.9" CreateTime="21NOV2017:18:50:25"
- Description="" Data="DATA.BANK" CMeta="WORK.M20JBBN3">
+ Description="" Data="DATA.BANK" CMeta="WORK.M20JBBN3" RunId="a65a7802-12cf-4ae5-a79f-8f5db5a45c33"
+>
 <VARIABLEPROPERTIES/>
 <FILEPROPERTIES/>
 </_ROOT_>

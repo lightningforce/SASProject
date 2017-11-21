@@ -9,234 +9,176 @@ Traverser: Beginning flow traversal
 *------------------------------------------------------------* 
 * 
 * Ids2 : Beginning Update 
-* datetime : 21NOV2017:18:50:59 
+* datetime : 21NOV2017:19:24:25 
 * 
 *------------------------------------------------------------* 
-21726      *------------------------------------------------------------*;
-21727      * Ids2: Update Variables Set;
-21728      *------------------------------------------------------------*;
-
-21729      data EMWS2.Ids2_VariableSet;
-21730      length ROLE $32;
-21731      length LEVEL $10;
-21732      length REPORT $1;
-21733      label REPORT = "Report";
-21734      length ORDER $8;
-21735      length DROP $1;
-21736      length LOWERLIMIT 8;
-21737      length UPPERLIMIT 8;
-21738      set EMWS2.Ids2_EMCMETADEFAULT;
-21739      run;
-
-NOTE: There were 3 observations read from the data set EMWS2.IDS2_EMCMETADEFAULT.
-NOTE: The data set EMWS2.IDS2_VARIABLESET has 3 observations and 21 variables.
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-21740      * Ids2: End of Update Variables Set;
-21741      *------------------------------------------------------------*;
-
-21742      *------------------------------------------------------------*;
-21743      * Ids2: Computing metadata for DATA data;
-21744      *------------------------------------------------------------*;
-
-21754      data EMWS2.Ids2_EMINFO;
-21755      length TARGET KEY $32 DATA $43;
-21756      TARGET="";
-21757      KEY="IDSTABLE";
-21758      DATA="DATA.BANK";
-21759      output;
-21760      run;
-
-NOTE: The data set EMWS2.IDS2_EMINFO has 1 observations and 3 variables.
-NOTE: DATA statement used (Total process time):
-      real time           0.01 seconds
-      cpu time            0.00 seconds
-      
-
-21761      data EMWS2.Ids2_CMeta_DATA;
-21762      set EMWS2.Ids2_VariableSet;
-21763      drop DROP;
-21764      where DROP='N';
-21765      run;
-
-NOTE: There were 3 observations read from the data set EMWS2.IDS2_VARIABLESET.
-      WHERE DROP='N';
-NOTE: The data set EMWS2.IDS2_CMETA_DATA has 3 observations and 20 variables.
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-21767      %let _HPDMGRIDHOST=;
-21768      %let _HPDMGRIDINSTALLLOC=;
-21769      %let _HPDMGRIDDATASERVER=;
-21770      %hpdm_gridSetOPtions;
+24500      %let _HPDMGRIDHOST=;
+24501      %let _HPDMGRIDINSTALLLOC=;
+24502      %let _HPDMGRIDDATASERVER=;
+24503      %hpdm_gridSetOPtions;
 
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
-      cpu time            0.00 seconds
+      cpu time            0.01 seconds
       
 
 
 *------------------------------------------------------------* 
 * 
 * Ids2 : End Update 
-* datetime : 21NOV2017:18:50:59 
+* datetime : 21NOV2017:19:24:25 
 * 
 *------------------------------------------------------------* 
 traverser_readyNode_note 
 *------------------------------------------------------------* 
 * 
-* Assoc : Beginning Update 
-* datetime : 21NOV2017:18:51:00 
+* Assoc2 : Beginning Update 
+* datetime : 21NOV2017:19:24:26 
 * 
 *------------------------------------------------------------* 
-21786      *------------------------------------------------------------*;
-21787      * Assoc: Update Variables Set;
-21788      *------------------------------------------------------------*;
+24519      *------------------------------------------------------------*;
+24520      * Assoc2: Update Variables Set;
+24521      *------------------------------------------------------------*;
 
-21789      data EMWS2.Assoc_VariableSet;
-21790      length USE $1;
-21791      label USE = "Use";
-21792      set EMWS2.Ids2_CMeta_DATA;
-21793      where((ROLE ="TARGET" and level ne "INTERVAL" ) or role in("ID" "SEQUENCE"));
-21794      run;
+24522      data EMWS2.Assoc2_VariableSet;
+24523      length USE $1;
+24524      label USE = "Use";
+24525      set EMWS2.Ids2_CMeta_DATA;
+24526      where((ROLE ="TARGET" and level ne "INTERVAL" ) or role in("ID" "SEQUENCE"));
+24527      run;
 
 NOTE: Variable USE is uninitialized.
 NOTE: There were 3 observations read from the data set EMWS2.IDS2_CMETA_DATA.
       WHERE ((ROLE='TARGET') and (level not = 'INTERVAL')) or role in ('ID', 'SEQUENCE');
-NOTE: The data set EMWS2.ASSOC_VARIABLESET has 3 observations and 21 variables.
+NOTE: The data set EMWS2.ASSOC2_VARIABLESET has 3 observations and 21 variables.
 NOTE: DATA statement used (Total process time):
-      real time           0.01 seconds
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+24528      * Assoc2: End of Update Variables Set;
+24529      *------------------------------------------------------------*;
+
+24530      *------------------------------------------------------------*;
+24531      * Assoc2: Computing metadata for TRAIN data;
+24532      *------------------------------------------------------------*;
+
+24533      data EMWS2.Assoc2_EMINFO;
+24534      length TARGET KEY $32 DATA $43;
+24535      TARGET='';
+24536      KEY='ASSOCIATION';
+24537      DATA="Assoc2";
+24538      output;
+24539      run;
+
+NOTE: The data set EMWS2.ASSOC2_EMINFO has 1 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+24540      *------------------------------------------------------------*;
+24541      * Assoc2: Computing metadata for RULES data;
+24542      *------------------------------------------------------------*;
+
+24543      data EMWS2.Assoc2_EMINFO;
+24544      length TARGET KEY $32 DATA $43;
+24545      TARGET='';
+24546      KEY='ASSOCIATION';
+24547      DATA="Assoc2";
+24548      output;
+24549      run;
+
+NOTE: The data set EMWS2.ASSOC2_EMINFO has 1 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+24550      *------------------------------------------------------------*;
+24551      * Assoc2: Computing metadata for TRANSACTION data;
+24552      *------------------------------------------------------------*;
+
+24553      *------------------------------------------------------------*;
+24554      * Assoc2: Create Metadata;
+24555      *------------------------------------------------------------*;
+24556      data EMWS2.Assoc2_CMeta_TRANSACTION;
+24557      set EMWS2.Ids2_CMeta_DATA;
+24558      run;
+
+NOTE: There were 3 observations read from the data set EMWS2.IDS2_CMETA_DATA.
+NOTE: The data set EMWS2.ASSOC2_CMETA_TRANSACTION has 3 observations and 20 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
       cpu time            0.01 seconds
       
 
-21795      * Assoc: End of Update Variables Set;
-21796      *------------------------------------------------------------*;
+24559      data EMWS2.Assoc2_EMINFO;
+24560      length TARGET KEY $32 DATA $43;
+24561      TARGET='';
+24562      KEY='ASSOCIATION';
+24563      DATA="Assoc2";
+24564      output;
+24565      run;
 
-21797      *------------------------------------------------------------*;
-21798      * Assoc: Computing metadata for TRAIN data;
-21799      *------------------------------------------------------------*;
-
-21800      data EMWS2.Assoc_EMINFO;
-21801      length TARGET KEY $32 DATA $43;
-21802      TARGET='';
-21803      KEY='ASSOCIATION';
-21804      DATA="Assoc";
-21805      output;
-21806      run;
-
-NOTE: The data set EMWS2.ASSOC_EMINFO has 1 observations and 3 variables.
+NOTE: The data set EMWS2.ASSOC2_EMINFO has 1 observations and 3 variables.
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
       cpu time            0.00 seconds
       
 
-21807      *------------------------------------------------------------*;
-21808      * Assoc: Computing metadata for RULES data;
-21809      *------------------------------------------------------------*;
-
-21810      data EMWS2.Assoc_EMINFO;
-21811      length TARGET KEY $32 DATA $43;
-21812      TARGET='';
-21813      KEY='ASSOCIATION';
-21814      DATA="Assoc";
-21815      output;
-21816      run;
-
-NOTE: The data set EMWS2.ASSOC_EMINFO has 1 observations and 3 variables.
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-21817      *------------------------------------------------------------*;
-21818      * Assoc: Computing metadata for TRANSACTION data;
-21819      *------------------------------------------------------------*;
-
-21820      *------------------------------------------------------------*;
-21821      * Assoc: Create Metadata;
-21822      *------------------------------------------------------------*;
-21823      data EMWS2.Assoc_CMeta_TRANSACTION;
-21824      set EMWS2.Ids2_CMeta_DATA;
-21825      run;
-
-NOTE: There were 3 observations read from the data set EMWS2.IDS2_CMETA_DATA.
-NOTE: The data set EMWS2.ASSOC_CMETA_TRANSACTION has 3 observations and 20 variables.
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-21826      data EMWS2.Assoc_EMINFO;
-21827      length TARGET KEY $32 DATA $43;
-21828      TARGET='';
-21829      KEY='ASSOCIATION';
-21830      DATA="Assoc";
-21831      output;
-21832      run;
-
-NOTE: The data set EMWS2.ASSOC_EMINFO has 1 observations and 3 variables.
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-21833      proc sort data = EMWS2.Ids2_EMINFO OUT=WORK.SORTEDEMINFO NOTHREADS;
-21834      by TARGET KEY;
-21835      run;
+24566      proc sort data = EMWS2.Ids2_EMINFO OUT=WORK.SORTEDEMINFO NOTHREADS;
+24567      by TARGET KEY;
+24568      run;
 
 NOTE: There were 1 observations read from the data set EMWS2.IDS2_EMINFO.
 NOTE: The data set WORK.SORTEDEMINFO has 1 observations and 3 variables.
 NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.01 seconds
+      
+
+24569      proc sort data = EMWS2.Assoc2_EMINFO OUT=WORK.TEMP_INFO NOTHREADS;
+24570      by TARGET KEY;
+24571      run;
+
+NOTE: There were 1 observations read from the data set EMWS2.ASSOC2_EMINFO.
+NOTE: The data set WORK.TEMP_INFO has 1 observations and 3 variables.
+NOTE: PROCEDURE SORT used (Total process time):
+      real time           0.03 seconds
+      cpu time            0.00 seconds
+      
+
+24572      data EMWS2.Assoc2_EMINFO;
+24573      merge WORK.SORTEDEMINFO WORK.TEMP_INFO;
+24574      by TARGET KEY;
+24575      run;
+
+NOTE: There were 1 observations read from the data set WORK.SORTEDEMINFO.
+NOTE: There were 1 observations read from the data set WORK.TEMP_INFO.
+NOTE: The data set EMWS2.ASSOC2_EMINFO has 2 observations and 3 variables.
+NOTE: DATA statement used (Total process time):
+      real time           0.00 seconds
+      cpu time            0.00 seconds
+      
+
+24576      proc datasets lib=work nolist;
+24577      delete TEMP_INFO SORTEDEMINFO;
+24578      run;
+
+NOTE: Deleting WORK.TEMP_INFO (memtype=DATA).
+NOTE: Deleting WORK.SORTEDEMINFO (memtype=DATA).
+24579      quit;
+
+NOTE: PROCEDURE DATASETS used (Total process time):
       real time           0.01 seconds
       cpu time            0.01 seconds
       
 
-21836      proc sort data = EMWS2.Assoc_EMINFO OUT=WORK.TEMP_INFO NOTHREADS;
-21837      by TARGET KEY;
-21838      run;
-
-NOTE: There were 1 observations read from the data set EMWS2.ASSOC_EMINFO.
-NOTE: The data set WORK.TEMP_INFO has 1 observations and 3 variables.
-NOTE: PROCEDURE SORT used (Total process time):
-      real time           0.01 seconds
-      cpu time            0.00 seconds
-      
-
-21839      data EMWS2.Assoc_EMINFO;
-21840      merge WORK.SORTEDEMINFO WORK.TEMP_INFO;
-21841      by TARGET KEY;
-21842      run;
-
-NOTE: There were 1 observations read from the data set WORK.SORTEDEMINFO.
-NOTE: There were 1 observations read from the data set WORK.TEMP_INFO.
-NOTE: The data set EMWS2.ASSOC_EMINFO has 2 observations and 3 variables.
-NOTE: DATA statement used (Total process time):
-      real time           0.00 seconds
-      cpu time            0.00 seconds
-      
-
-21843      proc datasets lib=work nolist;
-21844      delete TEMP_INFO SORTEDEMINFO;
-21845      run;
-
-NOTE: Deleting WORK.TEMP_INFO (memtype=DATA).
-NOTE: Deleting WORK.SORTEDEMINFO (memtype=DATA).
-21846      quit;
-
-NOTE: PROCEDURE DATASETS used (Total process time):
-      real time           0.01 seconds
-      cpu time            0.00 seconds
-      
-
-21848      %let _HPDMGRIDHOST=;
-21849      %let _HPDMGRIDINSTALLLOC=;
-21850      %let _HPDMGRIDDATASERVER=;
-21851      %hpdm_gridSetOPtions;
+24581      %let _HPDMGRIDHOST=;
+24582      %let _HPDMGRIDINSTALLLOC=;
+24583      %let _HPDMGRIDDATASERVER=;
+24584      %hpdm_gridSetOPtions;
 
 NOTE: DATA statement used (Total process time):
       real time           0.00 seconds
@@ -246,11 +188,11 @@ NOTE: DATA statement used (Total process time):
 
 *------------------------------------------------------------* 
 * 
-* Assoc : End Update 
-* datetime : 21NOV2017:18:51:00 
+* Assoc2 : End Update 
+* datetime : 21NOV2017:19:24:26 
 * 
 *------------------------------------------------------------* 
 Traverser: Run Completed 
-21852      proc printto;
-21853      run;
+24585      proc printto;
+24586      run;
 
